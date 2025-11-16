@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User::Portfolio_Main</title>
+
+    <link rel="stylesheet" href="styles.css"> 
+    
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="particles-js"></div>
+
+    <nav>
+        <a href="#home">/home</a>
+        <a href="#projects">/projects</a>
+        <a href="#achievements">/achievements</a>
+    </nav>
+
+    <main id="home">
+        <div class="terminal">
+            <div class="terminal-header">
+                <span class="terminal-title">> C:\Users\Guest\</span>
+            </div>
+            <div class="terminal-body">
+                <p>> Booting system...</p>
+                <p>> Accessing secure connection...</p>
+                <p>> Welcome, user.</p>
+                <p>> <span id="typed-text"></span></p>
+            </div>
+        </div>
+    </main>
+
+    <section id="projects">
+        <h2>/Projects</h2>
+        <p>This is where you'll show off your hardware and web projects.</p>
+        
+        <div class="wireframe-container">
+            <canvas id="wireframe-canvas"></canvas>
+            <p>Project 1: 3D Hardware Enclosure</p>
+        </div>
+        
+    </section>
+
+    <section id="achievements">
+        <h2>/Achievements</h2>
+        <p>This is where you can feature your hackathon win!</p>
+        <h3>2nd Place - My First Hackathon</h3>
+    </section>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+    <script src="https://unpkg.com/typed.js@2.1.0/dist/typed.umd.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <script src="script.js"></script>
+
+</body>
+</html>
