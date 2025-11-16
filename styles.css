@@ -3,8 +3,8 @@
     --primary-color: #FF9500; /* Your Accent Orange */
     --bg-color: #000000;      /* Pure Black */
     --text-color: #FFFFFF;    /* Pure White */
-    --border-color: #FFFFFF;  /* White or var(--primary-color) */
-    --bg-terminal: rgba(10, 10, 10, 0.8); /* Darker Transparent */
+    --border-color: #FFFFFF;
+    --bg-terminal: rgba(10, 10, 10, 0.8);
 }
 
 body, html {
@@ -17,7 +17,7 @@ body, html {
     scroll-behavior: smooth;
 }
 
-/* === NEW VANTA BACKGROUND === */
+/* === VANTA BACKGROUND === */
 #vanta-bg {
     position: fixed;
     width: 100%;
@@ -53,7 +53,7 @@ nav a:hover {
     border-color: var(--primary-color);
 }
 
-/* === TERMINAL === */
+/* === TERMINAL (Bigger) === */
 main {
     display: flex;
     justify-content: center;
@@ -63,11 +63,11 @@ main {
 }
 
 .terminal {
-    width: 80%;
-    max-width: 700px;
+    width: 90%;
+    max-width: 1000px; /* <-- Made wider */
     border: 2px solid var(--border-color);
     background-color: var(--bg-terminal);
-    box-shadow: 0 0 20px rgba(255, 149, 0, 0.5); /* Soft orange glow */
+    box-shadow: 0 0 20px rgba(255, 149, 0, 0.5);
     backdrop-filter: blur(3px);
     z-index: 10;
 }
@@ -81,20 +81,42 @@ main {
 
 .terminal-body {
     padding: 20px;
-    height: 300px;
-    color: var(--primary-color); /* Keep terminal text orange */
-}
-
-.typed-cursor {
+    height: 500px; /* <-- Made taller */
     color: var(--primary-color);
-    animation: blink 0.7s infinite;
+    overflow-y: auto; /* <-- Will scroll when full */
+    font-size: 1rem;
 }
 
-@keyframes blink {
-    0% { opacity: 1; } 50% { opacity: 0; } 100% { opacity: 1; }
+/* This targets the output paragraphs we will add with JS */
+.terminal-body p {
+    margin: 5px 0;
+    word-break: break-all; /* Prevents long text from overflowing */
 }
 
-/* === SECTION STYLES === */
+/* === NEW INTERACTIVE PROMPT STYLES === */
+.prompt-line {
+    padding: 0px 20px 10px 20px; /* Padding for the input line */
+    display: flex;
+}
+
+.prompt-user {
+    color: var(--text-color); /* White */
+    margin-right: 10px;
+    font-size: 1.1rem;
+}
+
+#terminal-input {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--primary-color); /* Orange */
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 1.1rem;
+    width: 85%; /* Fill the remaining space */
+}
+
+
+/* === SECTION STYLES (Unchanged) === */
 section {
     padding: 100px 10%;
     min-height: 80vh;
@@ -110,7 +132,7 @@ section h2 {
     padding-bottom: 10px;
 }
 
-/* === BRUTALIST MODULE STYLES === */
+/* === BRUTALIST MODULE STYLES (Unchanged) === */
 .module-container {
     border: 2px solid var(--border-color);
     background-color: var(--bg-color);
@@ -123,20 +145,15 @@ section h2 {
     align-items: center;
     background-color: var(--border-color);
     padding: 8px 15px;
-    color: var(--bg-color); /* Black text */
+    color: var(--bg-color);
     font-weight: bold;
 }
-
-.module-header-title {
-    text-transform: uppercase;
-}
-
+.module-header-title { text-transform: uppercase; }
 .module-header-info {
     font-size: 0.9rem;
     background-color: var(--primary-color);
     padding: 3px 6px;
 }
-
 .module-content {
     padding: 20px;
     display: flex;
@@ -144,7 +161,6 @@ section h2 {
     align-items: center;
     justify-content: center;
 }
-
 #wireframe-canvas {
     width: 300px;
     height: 300px;
