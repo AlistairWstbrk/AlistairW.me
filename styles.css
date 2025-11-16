@@ -1,4 +1,4 @@
-/* === NEW BRUTALIST COLORS === */
+/* === BRUTALIST COLORS === */
 :root {
     --primary-color: #FF9500; /* Your Accent Orange */
     --bg-color: #000000;      /* Pure Black */
@@ -11,14 +11,14 @@ body, html {
     margin: 0;
     padding: 0;
     background-color: var(--bg-color);
-    color: var(--text-color); /* Change default text to white */
+    color: var(--text-color);
     font-family: 'Share Tech Mono', monospace;
     font-size: 1.1rem;
     scroll-behavior: smooth;
 }
 
-/* === PARTICLE BACKGROUND (No Change) === */
-#particles-js {
+/* === NEW VANTA BACKGROUND === */
+#vanta-bg {
     position: fixed;
     width: 100%;
     height: 100%;
@@ -27,7 +27,7 @@ body, html {
     left: 0;
 }
 
-/* === NAV (New Style) === */
+/* === NAV === */
 nav {
     padding: 10px;
     text-align: center;
@@ -43,7 +43,7 @@ nav a {
     text-decoration: none;
     padding: 10px 20px;
     margin: 0 10px;
-    border: 1px solid transparent; /* Cleaner look */
+    border: 1px solid transparent;
     transition: all 0.3s ease;
 }
 
@@ -53,7 +53,7 @@ nav a:hover {
     border-color: var(--primary-color);
 }
 
-/* === TERMINAL (New Style) === */
+/* === TERMINAL === */
 main {
     display: flex;
     justify-content: center;
@@ -94,7 +94,7 @@ main {
     0% { opacity: 1; } 50% { opacity: 0; } 100% { opacity: 1; }
 }
 
-/* === SECTION STYLES (New Style) === */
+/* === SECTION STYLES === */
 section {
     padding: 100px 10%;
     min-height: 80vh;
@@ -110,11 +110,7 @@ section h2 {
     padding-bottom: 10px;
 }
 
-/* ================================================
-  === NEW BRUTALIST MODULE STYLES ===
-  This is the style from your image.
-  ================================================
-*/
+/* === BRUTALIST MODULE STYLES === */
 .module-container {
     border: 2px solid var(--border-color);
     background-color: var(--bg-color);
@@ -149,7 +145,6 @@ section h2 {
     justify-content: center;
 }
 
-/* We still use wireframe-canvas for the 3D object */
 #wireframe-canvas {
     width: 300px;
     height: 300px;
