@@ -1,0 +1,125 @@
+/* === NEW COLORS === */
+:root {
+    --primary-color: #FF9500; /* Starfield Orange */
+    --bg-color: #0a192f;      /* Dark Navy Blue */
+    --bg-terminal: rgba(10, 25, 47, 0.8); /* Dark Blue Transparent */
+}
+
+body, html {
+    margin: 0;
+    padding: 0;
+    background-color: var(--bg-color);
+    color: var(--primary-color);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 1.1rem;
+    scroll-behavior: smooth; /* This makes the nav links scroll smoothly */
+}
+
+/* === PARTICLE BACKGROUND (CRITICAL CHANGE) === */
+#particles-js {
+    position: fixed; /* Changed from 'absolute' */
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    top: 0;
+    left: 0;
+}
+
+nav {
+    padding: 20px;
+    text-align: center;
+    position: fixed; /* Stick nav to the top */
+    width: 100%;
+    background-color: var(--bg-color);
+    z-index: 100;
+}
+
+nav a {
+    color: var(--primary-color);
+    text-decoration: none;
+    padding: 10px 20px;
+    margin: 0 10px;
+    border: 1px solid var(--primary-color);
+    transition: all 0.3s ease;
+}
+
+nav a:hover {
+    background-color: var(--primary-color);
+    color: var(--bg-color);
+    text-shadow: 0 0 5px var(--primary-color);
+}
+
+/* === TERMINAL & WELCOME SCREEN === */
+main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Make the 'main' section fill the first screen */
+    padding-top: 60px; /* Offset for the fixed nav */
+}
+
+.terminal {
+    width: 80%;
+    max-width: 700px;
+    border: 2px solid var(--primary-color);
+    background-color: var(--bg-terminal);
+    box-shadow: 0 0 20px var(--primary-color);
+    backdrop-filter: blur(3px);
+    z-index: 10; /* Keep terminal on top of background */
+}
+
+.terminal-header {
+    background-color: var(--primary-color);
+    padding: 5px;
+    color: var(--bg-color);
+    font-weight: bold;
+}
+
+.terminal-body {
+    padding: 20px;
+    height: 300px;
+}
+
+.typed-cursor {
+    color: var(--primary-color);
+    animation: blink 0.7s infinite;
+}
+
+@keyframes blink {
+    0% { opacity: 1; }
+    50% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+/* === NEW SECTION STYLES === */
+section {
+    padding: 100px 10%; /* Top padding to clear the nav */
+    min-height: 80vh; /* Give the section space */
+    position: relative;
+    z-index: 10;
+}
+
+section h2 {
+    font-size: 3rem;
+    text-transform: uppercase;
+    border-bottom: 2px solid var(--primary-color);
+    padding-bottom: 10px;
+}
+
+/* === NEW 3D OBJECT STYLES === */
+.wireframe-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    border: 1px solid var(--primary-color);
+    background-color: var(--bg-terminal);
+    margin-top: 40px;
+}
+
+#wireframe-canvas {
+    width: 300px;
+    height: 300px;
+}
