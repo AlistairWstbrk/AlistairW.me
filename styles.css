@@ -14,7 +14,7 @@ body, html {
     color: var(--text-color);
     font-family: 'Share Tech Mono', monospace;
     font-size: 1.1rem;
-    scroll-behavior: smooth; /* <-- Re-added */
+    scroll-behavior: smooth;
 }
 
 /* === VANTA BACKGROUND === */
@@ -22,7 +22,7 @@ body, html {
     position: fixed;
     width: 100%;
     height: 100%;
-    z-index: -1; /* This puts it BEHIND your content */
+    z-index: -1;
     top: 0;
     left: 0;
 }
@@ -51,7 +51,7 @@ nav a:hover {
     border-color: var(--primary-color);
 }
 
-/* === TERMINAL (Smaller) === */
+/* === TERMINAL === */
 main {
     display: flex;
     justify-content: center;
@@ -61,7 +61,7 @@ main {
 }
 .terminal {
     width: 90%;
-    max-width: 700px; /* <-- Made smaller */
+    max-width: 700px;
     border: 2px solid var(--border-color);
     background-color: var(--bg-terminal);
     box-shadow: 0 0 20px rgba(255, 149, 0, 0.5);
@@ -76,7 +76,7 @@ main {
 }
 .terminal-body {
     padding: 20px;
-    height: 300px; /* <-- Made smaller */
+    height: 300px;
     color: var(--primary-color);
     overflow-y: auto;
     font-size: 1rem;
@@ -86,7 +86,7 @@ main {
     word-break: break-all;
 }
 
-/* === NEW LOADING BAR STYLES === */
+/* === LOADING BAR STYLES === */
 #loading-bar p {
     color: var(--text-color); /* White text */
 }
@@ -165,15 +165,11 @@ section h2 {
     align-items: center;
     justify-content: center;
 }
-#wireframe-canvas {
-    width: 300px;
-    height: 300px;
-}
-/* === NEW PROJECT STYLES (Add to end of file) === */
 
+/* === PROJECT-SPECIFIC STYLES === */
 .project-image {
     width: 100%;
-    max-width: 450px; /* Adjust size as needed */
+    max-width: 450px;
     border: 2px solid var(--border-color);
     margin-bottom: 20px;
 }
@@ -183,7 +179,7 @@ section h2 {
     padding-left: 15px;
     margin: 0 0 25px 0;
     font-style: italic;
-    color: #ccc; /* Slightly dimmer text */
+    color: #ccc;
     text-align: left;
     width: 100%;
 }
@@ -210,10 +206,22 @@ section h2 {
     width: 100%;
     margin-top: 25px;
     color: #ccc;
-    border-top: 1px solid #333; /* Faint separator line */
+    border-top: 1px solid #333;
     padding-top: 20px;
 }
-/* === NEW FOOTER STYLES === */
+
+.project-details p {
+    color: #ccc;
+    margin-bottom: 10px;
+}
+
+/* === "ABOUT ME" SECTION STYLES === */
+#about .module-content p {
+    color: var(--text-color);
+    width: 100%;
+}
+
+/* === FOOTER STYLES === */
 footer {
     padding: 20px 10%;
     text-align: center;
@@ -235,12 +243,7 @@ footer a:hover {
     color: var(--primary-color);
 }
 
-/* This is the brutalist "//" separator */
 footer span {
     color: var(--border-color);
     opacity: 0.5;
-}
-.project-details p {
-    color: #ccc;
-    margin-bottom: 10px;
 }
