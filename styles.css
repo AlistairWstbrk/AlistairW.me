@@ -213,7 +213,33 @@ section h2 {
     border-top: 1px solid #333; /* Faint separator line */
     padding-top: 20px;
 }
+/* === NEW FOOTER STYLES === */
+footer {
+    padding: 20px 10%;
+    text-align: center;
+    border-top: 2px solid var(--border-color);
+    background-color: var(--bg-color);
+    z-index: 10;
+    position: relative; /* This makes sure it renders on top of the Vanta bg */
+}
 
+footer a {
+    color: var(--text-color);
+    text-decoration: none;
+    margin: 0 15px;
+    font-size: 0.9rem;
+    transition: color 0.3s ease;
+}
+
+footer a:hover {
+    color: var(--primary-color);
+}
+
+/* This is the brutalist "//" separator */
+footer span {
+    color: var(--border-color);
+    opacity: 0.5;
+}
 .project-details p {
     color: #ccc;
     margin-bottom: 10px;
