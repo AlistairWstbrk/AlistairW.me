@@ -111,7 +111,8 @@ document.addEventListener("DOMContentLoaded", function() {
             case 'help':
                 response = "Available commands: <br>" +
                            "[help] - Show this message<br>" +
-                           "[socials] - Display contact links<br>" +
+                           "[whoami] - Display user bio<br>" +
+                           "[socials] - Display contact links<br>"_ +
                            "[ls] - List sections<br>" +
                            "[cat projects.txt] - Show list of projects<br>" +
                            "[nav &lt;section&gt;] - Navigate (e.g., 'nav projects')<br>" +
@@ -119,16 +120,20 @@ document.addEventListener("DOMContentLoaded", function() {
                 break;
             
             // === NEW COMMAND ===
+            case 'whoami':
+                [cite_start]response = "Alistair Westbrook: Freshman Mechanical Engineering student at UNL[cite: 11, 13]. [cite_start]Part of the Baja SAE team[cite: 24]. I build hardware (like Terraflo Analytics) and software (like Differdle.com).";
+                break;
+            // === END NEW COMMAND ===
+            
             case 'socials':
                 response = "--- Contact Links ---<br>" +
                            "<a href='https://github.com/AlistairWstbrk' target='_blank'>GitHub:   github.com/AlistairWstbrk</a><br>" +
                            "<a href='https://www.linkedin.com/in/alistairw' target='_blank'>LinkedIn: www.linkedin.com/in/alistairw</a><br>" +
                            "<a href='mailto:Westbrook.alistair@gmail.com'>Gmail:    Westbrook.alistair@gmail.com</a>";
                 break;
-            // === END NEW COMMAND ===
 
             case 'ls':
-                response = "projects  achievements";
+                response = "about  projects  achievements"; // <-- 'about' added
                 break;
 
             case 'cat':
@@ -156,6 +161,9 @@ document.addEventListener("DOMContentLoaded", function() {
                 } else if (arg === 'home') {
                     document.getElementById('home').scrollIntoView({ behavior: 'smooth' });
                     response = "Navigating to /home...";
+                } else if (arg === 'about') { // <-- 'about' added
+                    document.getElementById('about').scrollIntoView({ behavior: 'smooth' });
+                    response = "Navigating to /about...";
                 } else {
                     response = `Section not found: "${arg}". Try 'ls' to see sections.`;
                 }
