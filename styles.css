@@ -247,3 +247,10 @@ footer span {
     color: var(--border-color);
     opacity: 0.5;
 }
+/* === NEW TERMINAL IMAGE STYLE === */
+.terminal-image {
+    width: 90%; /* Make it fill most of the terminal */
+    max-width: 300px; /* But not get too big */
+    margin-top: 10px;
+    border: 2px solid var(--border-color);
+}
