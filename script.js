@@ -112,18 +112,17 @@ document.addEventListener("DOMContentLoaded", function() {
                 response = "Available commands: <br>" +
                            "[help] - Show this message<br>" +
                            "[whoami] - Display user bio<br>" +
-                           "[socials] - Display contact links<br>"_ +
+                           "[socials] - Display contact links<br>" +
                            "[ls] - List sections<br>" +
                            "[cat projects.txt] - Show list of projects<br>" +
                            "[nav &lt;section&gt;] - Navigate (e.g., 'nav projects')<br>" +
-                           "[clear] - Clear the terminal";
+                           "[clear] - Clear the terminal<br>" +
+                           "[lebron] - Show the goat"; // <-- 1. ADDED TO HELP
                 break;
             
-            // === NEW COMMAND ===
             case 'whoami':
-                [cite_start]response = "Alistair Westbrook: Freshman Mechanical Engineering student at UNL[cite: 11, 13]. [cite_start]Part of the Baja SAE team[cite: 24]. I build hardware (like Terraflo Analytics) and software (like Differdle.com).";
+                response = "Alistair Westbrook: Freshman Mechanical Engineering student at UNL. Part of the Baja SAE team. I build hardware (like Terraflo Analytics) and software (like Differdle.com).";
                 break;
-            // === END NEW COMMAND ===
             
             case 'socials':
                 response = "--- Contact Links ---<br>" +
@@ -133,7 +132,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 break;
 
             case 'ls':
-                response = "about  projects  achievements"; // <-- 'about' added
+                response = "about  projects  achievements";
                 break;
 
             case 'cat':
@@ -161,7 +160,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 } else if (arg === 'home') {
                     document.getElementById('home').scrollIntoView({ behavior: 'smooth' });
                     response = "Navigating to /home...";
-                } else if (arg === 'about') { // <-- 'about' added
+                } else if (arg === 'about') {
                     document.getElementById('about').scrollIntoView({ behavior: 'smooth' });
                     response = "Navigating to /about...";
                 } else {
@@ -170,7 +169,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 break;
 
             case 'clear':
-                // Clear all children except the first few (boot sequence + typed.js)
                 const initialMessages = document.querySelectorAll('.terminal-body p');
                 let messagesToKeep = 4;
                 for(let i = initialMessages.length - 1; i >= messagesToKeep; i--) {
@@ -178,6 +176,19 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
                 response = "Terminal cleared.";
                 break;
+
+            // === 2. NEW COMMAND ===
+            case 'lebron':
+                const img = document.createElement('img');
+                img.src = 'lebron.png'; // Make sure your file is named this!
+                img.alt = 'LeBron James, the GOAT, in the multiverse';
+                img.className = 'terminal-image';
+                terminalBody.appendChild(img);
+                
+                // We don't set a text 'response' here,
+                // because we're adding an image element directly.
+                break;
+            // === END NEW COMMAND ===
 
             default:
                 response = `Command not found: "${command}". Type 'help' for options.`;
