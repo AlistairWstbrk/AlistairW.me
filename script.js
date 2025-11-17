@@ -43,7 +43,7 @@ document.addEventListener("DOMContentLoaded", function() {
     var typed = new Typed('#typed-text', options);
 
     /* =================================================================== */
-    /* 3. NEW Loading Bar Function
+    /* 3. Loading Bar Function
     /* =================================================================== */
     const loadingSquares = document.getElementById('loading-squares');
     const terminalBody = document.querySelector('.terminal-body');
@@ -81,31 +81,9 @@ document.addEventListener("DOMContentLoaded", function() {
         }, 150); // Speed of loading (milliseconds)
     }
 
-    /* =================================================================== */
-    /* 4. three.js Script (Rotating Object)
-    /* =================================================================== */
-    const canvas = document.getElementById('wireframe-canvas');
-    if (canvas) {
-        const scene = new THREE.Scene();
-        const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true });
-        renderer.setSize(300, 300);
-        const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
-        camera.position.z = 5;
-        const geometry = new THREE.IcosahedronGeometry(2.5, 0);
-        const material = new THREE.MeshBasicMaterial({ color: 0xFF9500, wireframe: true });
-        const wireframe = new THREE.Mesh(geometry, material);
-        scene.add(wireframe);
-        function animate() {
-            requestAnimationFrame(animate);
-            wireframe.rotation.x += 0.002;
-            wireframe.rotation.y += 0.005;
-            renderer.render(scene, camera);
-        }
-        animate();
-    }
 
     /* =================================================================== */
-    /* 5. Terminal Interactivity
+    /* 4. Terminal Interactivity
     /* =================================================================== */
     const terminalInput = document.getElementById('terminal-input');
 
@@ -134,19 +112,33 @@ document.addEventListener("DOMContentLoaded", function() {
                 response = "Available commands: <br>" +
                            "[help] - Show this message<br>" +
                            "[ls] - List sections<br>" +
+                           "[cat projects.txt] - Show list of projects<br>" +
                            "[nav &lt;section&gt;] - Navigate (e.g., 'nav projects')<br>" +
                            "[clear] - Clear the terminal";
                 break;
+
             case 'ls':
                 response = "projects  achievements";
                 break;
+
+            case 'cat':
+                if (arg === 'projects.txt') {
+                    response = "--- Projects ---<br>" +
+                               "* <strong>Terraflo Analytics (AI/Hardware)</strong><br>" +
+                               "  An AI-powered hydroponic sensor device with a data dashboard.<br>" +
+                               "  <a href='https://cornhacks20.vercel.app/' target='_blank'>[View Demo]</a>";
+                } else {
+                    response = `File not found: "${arg}". Did you mean 'cat projects.txt'?`;
+                }
+                break;
+
             case 'nav':
                 if (arg === 'projects') {
                     document.getElementById('projects').scrollIntoView({ behavior: 'smooth' });
                     response = "Navigating to /projects...";
                 } else if (arg === 'achievements') {
                     document.getElementById('achievements').scrollIntoView({ behavior: 'smooth' });
-                    response = "Navigating to /achievements...";
+                    response = "Navigating to /home...";
                 } else if (arg === 'home') {
                     document.getElementById('home').scrollIntoView({ behavior: 'smooth' });
                     response = "Navigating to /home...";
@@ -154,6 +146,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     response = `Section not found: "${arg}". Try 'ls' to see sections.`;
                 }
                 break;
+
             case 'clear':
                 // Clear all children except the first few (boot sequence + typed.js)
                 const initialMessages = document.querySelectorAll('.terminal-body p');
@@ -163,6 +156,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
                 response = "Terminal cleared.";
                 break;
+
             default:
                 response = `Command not found: "${command}". Type 'help' for options.`;
                 break;
