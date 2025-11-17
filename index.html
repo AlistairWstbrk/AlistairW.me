@@ -38,7 +38,57 @@
             </div>
         </div>
     </main>
+</main>
 
+    <section id="about">
+        <h2>/About Me</h2>
+        
+        <div class="module-container">
+            <div class="module-header">
+                <span class="module-header-title">Alistair Westbrook</span>
+                <span class="module-header-info">UNL MECH. ENGINEERING '29</span>
+            </div>
+            <div class="module-content" style="align-items: flex-start; text-align: left;">
+                
+                <blockquote>
+                    Hello! [cite_start]I'm a freshman **Mechanical Engineering student at the University of Nebraska-Lincoln** [cite: 11, 13] [cite_start]with a strong passion for the **automotive sector**[cite: 34].
+                </blockquote>
+
+                <p style="color: var(--text-color);">
+                    My real passion is at the intersection of hardware and software. [cite_start]I'm a builder at heart, whether I'm prototyping physical components as a member of the **Baja SAE team** [cite: 24] or building a full-stack web application from scratch.
+                </p>
+                <p style="color: var(--text-color);">
+                    This "hands-on" approach is what led my hackathon team to win 2nd place for **Terraflo Analytics**, and it's what drove me to build **Differdle.com**, a calculus-based web game.
+                </p>
+                <p style="color: var(--text-color);">
+                    [cite_start]Outside of my personal projects, I've developed strong **leadership and training skills** [cite: 31] [cite_start]in fast-paced work environments, having trained new teams at both Raising Cane's and Charleys[cite: 47, 55]. [cite_start]I thrive on solving complex problems [cite: 33] and am always looking for the next challenge.
+                </p>
+
+                <div class="project-details">
+                    <p><strong>Quick Facts:</strong><br>
+                       - **Major:** B.S. [cite_start]Mechanical Engineering [cite: 13]<br>
+                       - [cite_start]**Certifications:** Entrepreneurship and Small Business [cite: 20]<br>
+                       - [cite_start]**Key Skills:** Prototyping [cite: 27][cite_start], Leadership[cite: 31], Web Development, Hardware Integration
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    ```
+
+---
+
+### 2. `styles.css` Update
+
+**Add this small block of CSS** to the very end of your `styles.css` file to make sure the text in the "About Me" section aligns properly.
+
+```css
+/* === "ABOUT ME" SECTION STYLES === */
+#about .module-content p {
+    color: var(--text-color);
+    width: 100%;
+}
     <section id="projects">
         <h2>/Projects</h2>
         
