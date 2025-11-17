@@ -111,11 +111,21 @@ document.addEventListener("DOMContentLoaded", function() {
             case 'help':
                 response = "Available commands: <br>" +
                            "[help] - Show this message<br>" +
+                           "[socials] - Display contact links<br>" +
                            "[ls] - List sections<br>" +
                            "[cat projects.txt] - Show list of projects<br>" +
                            "[nav &lt;section&gt;] - Navigate (e.g., 'nav projects')<br>" +
                            "[clear] - Clear the terminal";
                 break;
+            
+            // === NEW COMMAND ===
+            case 'socials':
+                response = "--- Contact Links ---<br>" +
+                           "<a href='https://github.com/AlistairWstbrk' target='_blank'>GitHub:   github.com/AlistairWstbrk</a><br>" +
+                           "<a href='https://www.linkedin.com/in/alistairw' target='_blank'>LinkedIn: www.linkedin.com/in/alistairw</a><br>" +
+                           "<a href='mailto:Westbrook.alistair@gmail.com'>Gmail:    Westbrook.alistair@gmail.com</a>";
+                break;
+            // === END NEW COMMAND ===
 
             case 'ls':
                 response = "projects  achievements";
@@ -125,8 +135,12 @@ document.addEventListener("DOMContentLoaded", function() {
                 if (arg === 'projects.txt') {
                     response = "--- Projects ---<br>" +
                                "* <strong>Terraflo Analytics (AI/Hardware)</strong><br>" +
-                               "  An AI-powered hydroponic sensor device with a data dashboard.<br>" +
-                               "  <a href='https://cornhacks20.vercel.app/' target='_blank'>[View Demo]</a>";
+                               "  An AI-powered hydroponic sensor device.<br>" +
+                               "  <a href='https://cornhacks20.vercel.app/' target='_blank'>[View Demo]</a><br><br>" +
+                               
+                               "* <strong>Differdle.com (Web App)</strong><br>" +
+                               "  A calculus-based game for solving derivatives.<br>" +
+                               "  <a href='https://Differdle.com' target='_blank'>[Play Game]</a>";
                 } else {
                     response = `File not found: "${arg}". Did you mean 'cat projects.txt'?`;
                 }
@@ -138,7 +152,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     response = "Navigating to /projects...";
                 } else if (arg === 'achievements') {
                     document.getElementById('achievements').scrollIntoView({ behavior: 'smooth' });
-                    response = "Navigating to /home...";
+                    response = "Navigating to /achievements...";
                 } else if (arg === 'home') {
                     document.getElementById('home').scrollIntoView({ behavior: 'smooth' });
                     response = "Navigating to /home...";
