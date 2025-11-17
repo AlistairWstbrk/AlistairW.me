@@ -1,8 +1,8 @@
 /* === BRUTALIST COLORS === */
 :root {
-    --primary-color: #FF9500; /* Your Accent Orange */
-    --bg-color: #000000;      /* Pure Black */
-    --text-color: #FFFFFF;    /* Pure White */
+    --primary-color: #FF9500;
+    --bg-color: #000000;
+    --text-color: #FFFFFF;
     --border-color: #FFFFFF;
     --bg-terminal: rgba(10, 10, 10, 0.8);
 }
@@ -14,7 +14,7 @@ body, html {
     color: var(--text-color);
     font-family: 'Share Tech Mono', monospace;
     font-size: 1.1rem;
-    scroll-behavior: smooth;
+    scroll-behavior: smooth; /* <-- Re-added */
 }
 
 /* === VANTA BACKGROUND === */
@@ -37,7 +37,6 @@ nav {
     border-bottom: 2px solid var(--border-color);
     z-index: 100;
 }
-
 nav a {
     color: var(--text-color);
     text-decoration: none;
@@ -46,14 +45,13 @@ nav a {
     border: 1px solid transparent;
     transition: all 0.3s ease;
 }
-
 nav a:hover {
     background-color: var(--primary-color);
     color: var(--bg-color);
     border-color: var(--primary-color);
 }
 
-/* === TERMINAL (Bigger) === */
+/* === TERMINAL (Smaller) === */
 main {
     display: flex;
     justify-content: center;
@@ -61,69 +59,76 @@ main {
     height: 100vh;
     padding-top: 60px;
 }
-
 .terminal {
     width: 90%;
-    max-width: 1000px; /* <-- Made wider */
+    max-width: 700px; /* <-- Made smaller */
     border: 2px solid var(--border-color);
     background-color: var(--bg-terminal);
     box-shadow: 0 0 20px rgba(255, 149, 0, 0.5);
     backdrop-filter: blur(3px);
     z-index: 10;
 }
-
 .terminal-header {
     background-color: var(--border-color);
     padding: 5px;
-    color: var(--bg-color); /* Black text */
+    color: var(--bg-color);
     font-weight: bold;
 }
-
 .terminal-body {
     padding: 20px;
-    height: 500px; /* <-- Made taller */
+    height: 300px; /* <-- Made smaller */
     color: var(--primary-color);
-    overflow-y: auto; /* <-- Will scroll when full */
+    overflow-y: auto;
     font-size: 1rem;
 }
-
-/* This targets the output paragraphs we will add with JS */
 .terminal-body p {
     margin: 5px 0;
-    word-break: break-all; /* Prevents long text from overflowing */
+    word-break: break-all;
 }
 
-/* === NEW INTERACTIVE PROMPT STYLES === */
+/* === NEW LOADING BAR STYLES === */
+#loading-bar p {
+    color: var(--text-color); /* White text */
+}
+.loading-square {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    background-color: #333; /* Empty square color */
+    margin: 0 1px;
+}
+.loading-square.filled {
+    background-color: var(--primary-color); /* Filled square color (orange) */
+}
+
+
+/* === PROMPT STYLES === */
 .prompt-line {
-    padding: 0px 20px 10px 20px; /* Padding for the input line */
+    padding: 0px 20px 10px 20px;
     display: flex;
 }
-
 .prompt-user {
-    color: var(--text-color); /* White */
+    color: var(--text-color);
     margin-right: 10px;
     font-size: 1.1rem;
 }
-
 #terminal-input {
     background: transparent;
     border: none;
     outline: none;
-    color: var(--primary-color); /* Orange */
+    color: var(--primary-color);
     font-family: 'Share Tech Mono', monospace;
     font-size: 1.1rem;
-    width: 85%; /* Fill the remaining space */
+    width: 85%;
 }
 
-
-/* === SECTION STYLES (Unchanged) === */
+/* === SECTION STYLES === */
 section {
     padding: 100px 10%;
     min-height: 80vh;
     position: relative;
     z-index: 10;
 }
-
 section h2 {
     font-size: 3rem;
     text-transform: uppercase;
@@ -132,13 +137,12 @@ section h2 {
     padding-bottom: 10px;
 }
 
-/* === BRUTALIST MODULE STYLES (Unchanged) === */
+/* === BRUTALIST MODULE STYLES === */
 .module-container {
     border: 2px solid var(--border-color);
     background-color: var(--bg-color);
     margin-top: 40px;
 }
-
 .module-header {
     display: flex;
     justify-content: space-between;
