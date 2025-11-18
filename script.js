@@ -113,11 +113,12 @@ document.addEventListener("DOMContentLoaded", function() {
                            "[help] - Show this message<br>" +
                            "[whoami] - Display user bio<br>" +
                            "[socials] - Display contact links<br>" +
+                           "[resume] - Download resume<br>" + 
                            "[ls] - List sections<br>" +
                            "[cat projects.txt] - Show list of projects<br>" +
                            "[nav &lt;section&gt;] - Navigate (e.g., 'nav projects')<br>" +
                            "[clear] - Clear the terminal<br>" +
-                           "[lebron] - Show the goat"; // <-- 1. ADDED TO HELP
+                           "[lebron] - Show the goat";
                 break;
             
             case 'whoami':
@@ -129,6 +130,17 @@ document.addEventListener("DOMContentLoaded", function() {
                            "<a href='https://github.com/AlistairWstbrk' target='_blank'>GitHub:   github.com/AlistairWstbrk</a><br>" +
                            "<a href='https://www.linkedin.com/in/alistairw' target='_blank'>LinkedIn: www.linkedin.com/in/alistairw</a><br>" +
                            "<a href='mailto:Westbrook.alistair@gmail.com'>Gmail:    Westbrook.alistair@gmail.com</a>";
+                break;
+
+            case 'resume':
+                response = "Downloading resume...";
+                // This triggers the download automatically
+                const link = document.createElement('a');
+                link.href = 'resume.pdf';
+                link.download = 'Alistair_Westbrook_Resume.pdf';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
                 break;
 
             case 'ls':
@@ -177,18 +189,13 @@ document.addEventListener("DOMContentLoaded", function() {
                 response = "Terminal cleared.";
                 break;
 
-            // === 2. NEW COMMAND ===
             case 'lebron':
                 const img = document.createElement('img');
-                img.src = 'lebron.png'; // Make sure your file is named this!
+                img.src = 'lebron.png';
                 img.alt = 'LeBron James, the GOAT, in the multiverse';
                 img.className = 'terminal-image';
                 terminalBody.appendChild(img);
-                
-                // We don't set a text 'response' here,
-                // because we're adding an image element directly.
                 break;
-            // === END NEW COMMAND ===
 
             default:
                 response = `Command not found: "${command}". Type 'help' for options.`;
