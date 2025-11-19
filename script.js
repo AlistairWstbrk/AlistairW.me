@@ -4,7 +4,7 @@
 document.addEventListener("DOMContentLoaded", function() {
 
     /* --- GLOBAL VARIABLES --- */
-    let cadRenderer, cadScene, cadCamera, cadAnimationId;
+    let cadRenderer, cadScene, cadCamera, cadAnimationId, cadControls;
     let cadMesh;
     let typedInstance;     
     let loadingInterval;   
@@ -22,6 +22,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
         const terminalBody = document.querySelector('.terminal-body');
         const oldPs = terminalBody.querySelectorAll('p');
+        
         const welcome = document.createElement('p');
         welcome.innerHTML = "Welcome, user.";
         terminalBody.appendChild(welcome);
@@ -35,18 +36,14 @@ document.addEventListener("DOMContentLoaded", function() {
     };
 
     /* =================================================================== */
-    /* 1. CAD FILE REGISTRY
+    /* 1. CAD FILE REGISTRY (EDIT THIS!)
     /* =================================================================== */
     const cadFiles = {
-        'gnome': { 
-            file: 'project.stl', 
-            description: 'Just a cute little gnome, nothing too special' 
-        },
         'enclosure': { 
-            file: 'terracase.stl', 
-            description: 'Terraflo enclosure made as a prototype case to show off at cornhacks, it was too tight for the pcb.' 
+            file: 'project.stl', 
+            description: 'Terraflo Main Enclosure (v2)' 
         },
-        // Add more files here as needed
+        // Add more files here...
     };
 
     /* =================================================================== */
@@ -162,6 +159,7 @@ document.addEventListener("DOMContentLoaded", function() {
             case 'help':
                 response = "Available commands: <br>" +
                            "[cad] - View 3D files <span style='color:#fff'>(UPDATED)</span><br>" +
+                           "[crt] - Toggle monitor effects<br>" +
                            "[game] - Play Snake<br>" +
                            "[whoami] - Bio<br>" +
                            "[socials] - Links<br>" +
@@ -185,6 +183,17 @@ document.addEventListener("DOMContentLoaded", function() {
                     return; 
                 } else {
                     response = `File '${arg}' not found. Type 'cad' for list.`;
+                }
+                break;
+            
+            case 'crt':
+                const overlay = document.getElementById('crt-overlay');
+                if (overlay.classList.contains('crt-off')) {
+                    overlay.classList.remove('crt-off');
+                    response = "CRT visual effects: [ONLINE]";
+                } else {
+                    overlay.classList.add('crt-off');
+                    response = "CRT visual effects: [OFFLINE]";
                 }
                 break;
 
@@ -261,7 +270,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     /* =================================================================== */
-    /* 6. HOLOGRAPHIC CAD VIEWER (With Wireframe Toggle)
+    /* 6. HOLOGRAPHIC CAD VIEWER (With OrbitControls & Zoom)
     /* =================================================================== */
     window.closeCad = function() {
         document.getElementById('cad-overlay').style.display = 'none';
@@ -269,12 +278,22 @@ document.addEventListener("DOMContentLoaded", function() {
         printToTerminal("CAD Viewer Terminated.");
     };
 
-    // === NEW TOGGLE FUNCTION ===
     window.toggleWireframe = function() {
         if(cadMesh && cadMesh.material) {
-            // Invert the wireframe boolean
             cadMesh.material.wireframe = !cadMesh.material.wireframe;
         }
+    };
+
+    // === NEW ZOOM FUNCTION ===
+    window.cadZoom = function(direction) {
+        if (!cadCamera) return;
+        const zoomFactor = 1.2;
+        if (direction === 'in') {
+            cadCamera.position.divideScalar(zoomFactor);
+        } else {
+            cadCamera.position.multiplyScalar(zoomFactor);
+        }
+        cadCamera.updateProjectionMatrix();
     };
 
     function launchCadViewer(filename) {
@@ -295,6 +314,13 @@ document.addEventListener("DOMContentLoaded", function() {
         cadRenderer = new THREE.WebGLRenderer({ alpha: false, antialias: true });
         cadRenderer.setSize(container.clientWidth, container.clientHeight);
         container.appendChild(cadRenderer.domElement);
+
+        // === ORBIT CONTROLS (The Magic Zoom/Pan/Rotate Tool) ===
+        // This allows scroll wheel zoom and mouse dragging
+        cadControls = new THREE.OrbitControls(cadCamera, cadRenderer.domElement);
+        cadControls.enableDamping = true;
+        cadControls.dampingFactor = 0.05;
+        cadControls.screenSpacePanning = true;
 
         // Lighting
         const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
@@ -325,7 +351,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 roughness: 0.5, 
                 metalness: 0.5, 
                 side: THREE.DoubleSide,
-                wireframe: false // Start solid
+                wireframe: false 
             });
             cadMesh = new THREE.Mesh(geometry, material);
             
@@ -336,32 +362,33 @@ document.addEventListener("DOMContentLoaded", function() {
             
             cadCamera.position.set(0, 5, 20);
             cadCamera.lookAt(0, 0, 0);
+            cadControls.update(); // Important to update controls after moving camera
 
             printToTerminal("Model loaded.");
         }, undefined, (err) => { console.error(err); printToTerminal("Error loading file."); });
 
         animateCad();
-
-        // Mouse Rotation
-        let isDragging = false;
-        let previousMousePosition = { x: 0, y: 0 };
-        container.addEventListener('mousedown', () => { isDragging = true; });
-        container.addEventListener('mouseup', () => { isDragging = false; });
-        container.addEventListener('mousemove', (e) => {
-            if (isDragging && cadMesh) {
-                const deltaMove = { x: e.offsetX - previousMousePosition.x, y: e.offsetY - previousMousePosition.y };
-                cadMesh.rotation.z -= deltaMove.x * 0.01;
-                cadMesh.rotation.x -= deltaMove.y * 0.01;
-                document.getElementById('rot-val').innerText = 
-                    `${cadMesh.rotation.x.toFixed(1)}, ${cadMesh.rotation.y.toFixed(1)}, ${cadMesh.rotation.z.toFixed(1)}`;
-            }
-            previousMousePosition = { x: e.offsetX, y: e.offsetY };
-        });
     }
 
     function animateCad() {
         cadAnimationId = requestAnimationFrame(animateCad);
-        if(cadMesh) cadMesh.rotation.z += 0.002;
+        
+        // Need to update controls every frame for damping
+        if(cadControls) cadControls.update();
+
+        // Update HUD Rotation/Zoom Display
+        if(cadMesh && cadCamera) {
+            const rotX = cadMesh.rotation.x.toFixed(2);
+            const rotY = cadMesh.rotation.y.toFixed(2);
+            const zoomLvl = (20 / cadCamera.position.distanceTo(new THREE.Vector3(0,0,0))).toFixed(2);
+            
+            // Safe check if element exists
+            const rotEl = document.getElementById('rot-val');
+            const zoomEl = document.getElementById('zoom-val');
+            if (rotEl) rotEl.innerText = `${rotX}, ${rotY}`;
+            if (zoomEl) zoomEl.innerText = `${zoomLvl}x`;
+        }
+
         cadRenderer.render(cadScene, cadCamera);
     }
 
@@ -375,7 +402,30 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     /* =================================================================== */
-    /* 7. SNAKE GAME LOGIC
+    /* 7. HACKER TEXT DECRYPTION EFFECT
+    /* =================================================================== */
+    const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890@#$%^&*";
+    document.querySelectorAll(".hacker-text").forEach(element => {
+        element.addEventListener("mouseover", event => {  
+            let iteration = 0;
+            const originalText = event.target.dataset.value;
+            clearInterval(event.target.interval);
+            event.target.interval = setInterval(() => {
+                event.target.innerText = event.target.innerText
+                    .split("")
+                    .map((letter, index) => {
+                        if(index < iteration) return originalText[index];
+                        return letters[Math.floor(Math.random() * 26)];
+                    })
+                    .join("");
+                if(iteration >= originalText.length) clearInterval(event.target.interval);
+                iteration += 1 / 3; 
+            }, 30);
+        });
+    });
+
+    /* =================================================================== */
+    /* 8. SNAKE GAME LOGIC
     /* =================================================================== */
     let snake = [], food = {}, direction = 'right', nextDirection = 'right', score = 0, gameInterval;
     document.addEventListener('keydown', (e) => {
@@ -421,39 +471,5 @@ document.addEventListener("DOMContentLoaded", function() {
         const info = document.getElementById('game-info'); if(info) info.remove();
         printToTerminal(`GAME OVER. Final Score: ${score}`); printToTerminal("Type 'game' to play again."); terminalInput.focus();
     }
-    /* =================================================================== */
-    /* 9. HACKER TEXT DECRYPTION EFFECT
-    /* =================================================================== */
-    const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890@#$%^&*";
-
-    // Select all elements with the 'hacker-text' class
-    document.querySelectorAll(".hacker-text").forEach(element => {
-        
-        element.addEventListener("mouseover", event => {  
-            let iteration = 0;
-            const originalText = event.target.dataset.value; // Get original text
-            
-            clearInterval(event.target.interval);
-            
-            event.target.interval = setInterval(() => {
-                event.target.innerText = event.target.innerText
-                    .split("")
-                    .map((letter, index) => {
-                        if(index < iteration) {
-                            return originalText[index];
-                        }
-                        return letters[Math.floor(Math.random() * 26)];
-                    })
-                    .join("");
-                
-                if(iteration >= originalText.length){ 
-                    clearInterval(event.target.interval);
-                }
-                
-                // Controls speed of decryption (higher += faster)
-                iteration += 1 / 3; 
-            }, 30);
-        });
-    });
 
 }); // End of "DOMContentLoaded"
