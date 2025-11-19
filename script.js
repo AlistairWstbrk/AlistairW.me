@@ -269,7 +269,9 @@ document.addEventListener("DOMContentLoaded", function() {
     function launchCadViewer(filename) {
         const overlay = document.getElementById('cad-overlay');
         const container = document.getElementById('cad-canvas-container');
-        const controlText = document.querySelector('#cad-controls span');
+        
+        // UPDATE: Target the new title ID
+        const controlText = document.getElementById('cad-title-text'); 
         
         overlay.style.display = 'flex';
         container.innerHTML = ''; 
