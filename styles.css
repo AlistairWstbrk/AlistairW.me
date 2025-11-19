@@ -458,3 +458,14 @@ footer span {
     margin-top: 10px;
     border: 2px solid var(--border-color);
 }
+/* === GLITCH TEXT EFFECT === */
+.hacker-text {
+    font-family: 'Share Tech Mono', monospace;
+    cursor: crosshair; /* Adds a targeting feel */
+}
+
+/* Optional: Make it glow while scrambling */
+.hacker-text:hover {
+    color: #fff;
+    text-shadow: 0 0 5px #fff;
+}
