@@ -4,9 +4,47 @@
 document.addEventListener("DOMContentLoaded", function() {
 
     /* =================================================================== */
+    /* 0. AUDIO SYNTHESIS (THE UPGRADE)
+    /* Generates sound effects using the browser's Audio API.
+    /* =================================================================== */
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playSound(type) {
+        // Browser requires user interaction to start audio context
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+
+        const osc = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        
+        osc.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+
+        if (type === 'key') {
+            // Subtle mechanical click for typing
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.05);
+            gainNode.gain.setValueAtTime(0.03, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.05);
+        } else if (type === 'success') {
+            // Sci-fi "Data Processed" Chime
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(500, audioCtx.currentTime);
+            osc.frequency.linearRampToValueAtTime(1000, audioCtx.currentTime + 0.1);
+            gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.3);
+        }
+    }
+
+
+    /* =================================================================== */
     /* 1. Vanta.js Script (Wireframe Landscape)
     /* =================================================================== */
-    VANTA.NET({
+    let vantaEffect = VANTA.NET({
         el: "#vanta-bg",
         mouseControls: true,
         touchControls: true,
@@ -15,15 +53,52 @@ document.addEventListener("DOMContentLoaded", function() {
         minWidth: 200.00,
         scale: 1.00,
         scaleMobile: 1.00,
-        color: 0xff9500, // Your orange
-        backgroundColor: 0x0, // Your black
+        color: 0xff9500, // Default Orange
+        backgroundColor: 0x0, // Black
         points: 10.00,
         maxDistance: 25.00,
         spacing: 20.00
     });
 
+
     /* =================================================================== */
-    /* 2. Typed.js Script (with new Loading Bar)
+    /* 2. Konami Code Listener (Hacker Mode Easter Egg)
+    /* Sequence: Up, Up, Down, Down, Left, Right, Left, Right, b, a
+    /* =================================================================== */
+    const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
+    let konamiIndex = 0;
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === konamiCode[konamiIndex]) {
+            konamiIndex++;
+            if (konamiIndex === konamiCode.length) {
+                activateHackerMode();
+                konamiIndex = 0;
+            }
+        } else {
+            konamiIndex = 0;
+        }
+    });
+
+    function activateHackerMode() {
+        playSound('success');
+        // Update CSS Variables to Matrix Green
+        document.documentElement.style.setProperty('--primary-color', '#00ff00');
+        document.documentElement.style.setProperty('--text-color', '#00ff00');
+        document.documentElement.style.setProperty('--border-color', '#00ff00');
+        
+        // Update Vanta Background color
+        vantaEffect.setOptions({
+            color: 0x00ff00,
+            backgroundColor: 0x000000
+        });
+        
+        printToTerminal("SYSTEM HACKED. ROOT ACCESS GRANTED.");
+    }
+
+
+    /* =================================================================== */
+    /* 3. Typed.js Script (with new Loading Bar)
     /* =================================================================== */
     var options = {
         strings: [
@@ -35,15 +110,15 @@ document.addEventListener("DOMContentLoaded", function() {
         loop: false,
         showCursor: true,
         onComplete: function() {
-            // When typing is done, show loading bar and start it
             document.getElementById('loading-bar').style.display = 'block';
             startLoadingBar();
         }
     };
     var typed = new Typed('#typed-text', options);
 
+
     /* =================================================================== */
-    /* 3. Loading Bar Function
+    /* 4. Loading Bar Function
     /* =================================================================== */
     const loadingSquares = document.getElementById('loading-squares');
     const terminalBody = document.querySelector('.terminal-body');
@@ -51,48 +126,46 @@ document.addEventListener("DOMContentLoaded", function() {
     let currentSquare = 0;
 
     function startLoadingBar() {
-        // Create empty squares
         for (let i = 0; i < numSquares; i++) {
             const square = document.createElement('span');
             square.className = 'loading-square';
             loadingSquares.appendChild(square);
         }
 
-        // Fill squares one by one
         const fillInterval = setInterval(() => {
             if (currentSquare < numSquares) {
                 loadingSquares.children[currentSquare].classList.add('filled');
+                playSound('key'); // Sound effect for loading
                 currentSquare++;
             } else {
-                // Loading finished!
                 clearInterval(fillInterval);
-                
-                // Hide loading bar
                 document.getElementById('loading-bar').style.display = 'none';
                 
-                // Print final messages
                 printToTerminal("Access granted. Welcome, user.");
                 printToTerminal("Type 'help' for a list of commands.");
                 
-                // Show interactive prompt
                 document.querySelector('.prompt-line').style.display = 'flex';
                 document.getElementById('terminal-input').focus();
             }
-        }, 150); // Speed of loading (milliseconds)
+        }, 150);
     }
 
 
     /* =================================================================== */
-    /* 4. Terminal Interactivity
+    /* 5. Terminal Interactivity
     /* =================================================================== */
     const terminalInput = document.getElementById('terminal-input');
+
+    // Add sound to typing
+    terminalInput.addEventListener('input', () => {
+        playSound('key');
+    });
 
     terminalInput.addEventListener('keydown', function(event) {
         if (event.key === 'Enter') {
             event.preventDefault();
             const command = terminalInput.value.trim().toLowerCase();
             
-            // Echo user's command
             printToTerminal(`<span class="prompt-user">> GUEST:</span> ${command}`);
             
             processCommand(command);
@@ -134,7 +207,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
             case 'resume':
                 response = "Downloading resume...";
-                // This triggers the download automatically
                 const link = document.createElement('a');
                 link.href = 'resume.pdf';
                 link.download = 'Alistair_Westbrook_Resume.pdf';
@@ -205,51 +277,13 @@ document.addEventListener("DOMContentLoaded", function() {
         if(response) printToTerminal(response);
     }
 
-   // Helper function to print to terminal
+    // Helper function to print to terminal
     function printToTerminal(message) {
-        playSound('success'); // <--- NEW LINE: Play sound
+        playSound('success'); // <--- TRIGGER SOUND EFFECT
         const output = document.createElement('p');
         output.innerHTML = message;
         terminalBody.appendChild(output);
         terminalBody.scrollTop = terminalBody.scrollHeight;
     }
-    /* =================================================================== */
-/* 6. AUDIO SYNTHESIS (The "Gemini 3" Upgrade)
-/* Generates sci-fi sounds using the Web Audio API. No files needed.
-/* =================================================================== */
-const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-function playSound(type) {
-    if (audioCtx.state === 'suspended') audioCtx.resume();
-    const osc = audioCtx.createOscillator();
-    const gainNode = audioCtx.createGain();
-    
-    osc.connect(gainNode);
-    gainNode.connect(audioCtx.destination);
-
-    if (type === 'key') {
-        // Subtle typing click
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(800, audioCtx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.03);
-        gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.03);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.03);
-    } else if (type === 'success') {
-        // "Access Granted" Chime
-        osc.type = 'square';
-        osc.frequency.setValueAtTime(440, audioCtx.currentTime);
-        osc.frequency.setValueAtTime(880, audioCtx.currentTime + 0.1);
-        gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
-        gainNode.gain.linearRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.3);
-    }
-}
-
-// Attach sound to typing
-document.getElementById('terminal-input').addEventListener('input', () => {
-    playSound('key');
-});
-
+}); // End of "DOMContentLoaded"
