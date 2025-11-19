@@ -4,23 +4,18 @@
 document.addEventListener("DOMContentLoaded", function() {
 
     /* =================================================================== */
-    /* 0. AUDIO SYNTHESIS (THE UPGRADE)
-    /* Generates sound effects using the browser's Audio API.
+    /* 1. AUDIO SYNTHESIS
     /* =================================================================== */
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
     function playSound(type) {
-        // Browser requires user interaction to start audio context
         if (audioCtx.state === 'suspended') audioCtx.resume();
-
         const osc = audioCtx.createOscillator();
         const gainNode = audioCtx.createGain();
-        
         osc.connect(gainNode);
         gainNode.connect(audioCtx.destination);
 
         if (type === 'key') {
-            // Subtle mechanical click for typing
             osc.type = 'triangle';
             osc.frequency.setValueAtTime(600, audioCtx.currentTime);
             osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.05);
@@ -29,7 +24,6 @@ document.addEventListener("DOMContentLoaded", function() {
             osc.start();
             osc.stop(audioCtx.currentTime + 0.05);
         } else if (type === 'success') {
-            // Sci-fi "Data Processed" Chime
             osc.type = 'sine';
             osc.frequency.setValueAtTime(500, audioCtx.currentTime);
             osc.frequency.linearRampToValueAtTime(1000, audioCtx.currentTime + 0.1);
@@ -37,12 +31,27 @@ document.addEventListener("DOMContentLoaded", function() {
             gainNode.gain.linearRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
             osc.start();
             osc.stop(audioCtx.currentTime + 0.3);
+        } else if (type === 'fail') { // New Fail Sound
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+            osc.frequency.linearRampToValueAtTime(50, audioCtx.currentTime + 0.3);
+            gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.3);
+        } else if (type === 'eat') { // New Eat Sound
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+            osc.frequency.setValueAtTime(1200, audioCtx.currentTime + 0.05);
+            gainNode.gain.setValueAtTime(0.03, audioCtx.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.1);
         }
     }
 
-
     /* =================================================================== */
-    /* 1. Vanta.js Script (Wireframe Landscape)
+    /* 2. Vanta.js Script
     /* =================================================================== */
     let vantaEffect = VANTA.NET({
         el: "#vanta-bg",
@@ -53,58 +62,46 @@ document.addEventListener("DOMContentLoaded", function() {
         minWidth: 200.00,
         scale: 1.00,
         scaleMobile: 1.00,
-        color: 0xff9500, // Default Orange
+        color: 0xff9500, // Orange
         backgroundColor: 0x0, // Black
         points: 10.00,
         maxDistance: 25.00,
         spacing: 20.00
     });
 
-
     /* =================================================================== */
-    /* 2. Konami Code Listener (Hacker Mode Easter Egg)
-    /* Sequence: Up, Up, Down, Down, Left, Right, Left, Right, b, a
+    /* 3. Konami Code Listener
     /* =================================================================== */
     const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
     let konamiIndex = 0;
 
     document.addEventListener('keydown', (e) => {
-        if (e.key === konamiCode[konamiIndex]) {
+        // Only check konami if game is NOT running to avoid conflict
+        if (!gameRunning && e.key === konamiCode[konamiIndex]) {
             konamiIndex++;
             if (konamiIndex === konamiCode.length) {
                 activateHackerMode();
                 konamiIndex = 0;
             }
-        } else {
+        } else if (!gameRunning) {
             konamiIndex = 0;
         }
     });
 
     function activateHackerMode() {
         playSound('success');
-        // Update CSS Variables to Matrix Green
         document.documentElement.style.setProperty('--primary-color', '#00ff00');
         document.documentElement.style.setProperty('--text-color', '#00ff00');
         document.documentElement.style.setProperty('--border-color', '#00ff00');
-        
-        // Update Vanta Background color
-        vantaEffect.setOptions({
-            color: 0x00ff00,
-            backgroundColor: 0x000000
-        });
-        
+        vantaEffect.setOptions({ color: 0x00ff00, backgroundColor: 0x000000 });
         printToTerminal("SYSTEM HACKED. ROOT ACCESS GRANTED.");
     }
 
-
     /* =================================================================== */
-    /* 3. Typed.js Script (with new Loading Bar)
+    /* 4. Typed.js Script
     /* =================================================================== */
     var options = {
-        strings: [
-            "Initializing portfolio interface...",
-            "Loading modules..."
-        ],
+        strings: ["Initializing portfolio interface...", "Loading modules..."],
         typeSpeed: 40,
         backSpeed: 20,
         loop: false,
@@ -116,9 +113,8 @@ document.addEventListener("DOMContentLoaded", function() {
     };
     var typed = new Typed('#typed-text', options);
 
-
     /* =================================================================== */
-    /* 4. Loading Bar Function
+    /* 5. Loading Bar Function
     /* =================================================================== */
     const loadingSquares = document.getElementById('loading-squares');
     const terminalBody = document.querySelector('.terminal-body');
@@ -135,42 +131,63 @@ document.addEventListener("DOMContentLoaded", function() {
         const fillInterval = setInterval(() => {
             if (currentSquare < numSquares) {
                 loadingSquares.children[currentSquare].classList.add('filled');
-                playSound('key'); // Sound effect for loading
+                playSound('key');
                 currentSquare++;
             } else {
                 clearInterval(fillInterval);
                 document.getElementById('loading-bar').style.display = 'none';
-                
                 printToTerminal("Access granted. Welcome, user.");
                 printToTerminal("Type 'help' for a list of commands.");
-                
                 document.querySelector('.prompt-line').style.display = 'flex';
                 document.getElementById('terminal-input').focus();
             }
         }, 150);
     }
 
-
     /* =================================================================== */
-    /* 5. Terminal Interactivity
+    /* 6. TERMINAL & GAME ENGINE
     /* =================================================================== */
     const terminalInput = document.getElementById('terminal-input');
+    let gameRunning = false;
+    let gameInterval;
+    let snake = [];
+    let food = {};
+    let direction = 'right';
+    let nextDirection = 'right';
+    let score = 0;
 
-    // Add sound to typing
-    terminalInput.addEventListener('input', () => {
-        playSound('key');
-    });
+    // Typing sounds
+    terminalInput.addEventListener('input', () => playSound('key'));
 
+    // Main Input Handler
     terminalInput.addEventListener('keydown', function(event) {
+        // If game is running, prevent default terminal behavior for arrows
+        if (gameRunning) return;
+
         if (event.key === 'Enter') {
             event.preventDefault();
             const command = terminalInput.value.trim().toLowerCase();
-            
             printToTerminal(`<span class="prompt-user">> GUEST:</span> ${command}`);
-            
             processCommand(command);
             terminalInput.value = '';
             terminalBody.scrollTop = terminalBody.scrollHeight;
+        }
+    });
+
+    // Global key listener for Game Controls
+    document.addEventListener('keydown', (e) => {
+        if (gameRunning) {
+            // Prevent scrolling with arrow keys
+            if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].indexOf(e.code) > -1) {
+                e.preventDefault();
+            }
+            
+            switch(e.key) {
+                case 'ArrowUp': if (direction !== 'down') nextDirection = 'up'; break;
+                case 'ArrowDown': if (direction !== 'up') nextDirection = 'down'; break;
+                case 'ArrowLeft': if (direction !== 'right') nextDirection = 'left'; break;
+                case 'ArrowRight': if (direction !== 'left') nextDirection = 'right'; break;
+            }
         }
     });
 
@@ -184,14 +201,15 @@ document.addEventListener("DOMContentLoaded", function() {
             case 'help':
                 response = "Available commands: <br>" +
                            "[help] - Show this message<br>" +
-                           "[whoami] - Display user bio<br>" +
-                           "[socials] - Display contact links<br>" +
-                           "[resume] - Download resume<br>" + 
-                           "[ls] - List sections<br>" +
-                           "[cat projects.txt] - Show list of projects<br>" +
-                           "[nav &lt;section&gt;] - Navigate (e.g., 'nav projects')<br>" +
-                           "[clear] - Clear the terminal<br>" +
-                           "[lebron] - Show the goat";
+                           "[game] - Play Snake <span style='color:#fff'>(NEW!)</span><br>" +
+                           "[whoami] - Bio<br>" +
+                           "[socials] - Links<br>" +
+                           "[resume] - Download PDF<br>" + 
+                           "[ls] - Sections<br>" +
+                           "[cat projects.txt] - Projects<br>" +
+                           "[nav &lt;section&gt;] - Go to page<br>" +
+                           "[clear] - Clear<br>" +
+                           "[lebron] - The GOAT";
                 break;
             
             case 'whoami':
@@ -225,7 +243,6 @@ document.addEventListener("DOMContentLoaded", function() {
                                "* <strong>Terraflo Analytics (AI/Hardware)</strong><br>" +
                                "  An AI-powered hydroponic sensor device.<br>" +
                                "  <a href='https://cornhacks20.vercel.app/' target='_blank'>[View Demo]</a><br><br>" +
-                               
                                "* <strong>Differdle.com (Web App)</strong><br>" +
                                "  A calculus-based game for solving derivatives.<br>" +
                                "  <a href='https://Differdle.com' target='_blank'>[Play Game]</a>";
@@ -235,20 +252,11 @@ document.addEventListener("DOMContentLoaded", function() {
                 break;
 
             case 'nav':
-                if (arg === 'projects') {
-                    document.getElementById('projects').scrollIntoView({ behavior: 'smooth' });
-                    response = "Navigating to /projects...";
-                } else if (arg === 'achievements') {
-                    document.getElementById('achievements').scrollIntoView({ behavior: 'smooth' });
-                    response = "Navigating to /achievements...";
-                } else if (arg === 'home') {
-                    document.getElementById('home').scrollIntoView({ behavior: 'smooth' });
-                    response = "Navigating to /home...";
-                } else if (arg === 'about') {
-                    document.getElementById('about').scrollIntoView({ behavior: 'smooth' });
-                    response = "Navigating to /about...";
+                if (['projects', 'achievements', 'home', 'about'].includes(arg)) {
+                    document.getElementById(arg).scrollIntoView({ behavior: 'smooth' });
+                    response = `Navigating to /${arg}...`;
                 } else {
-                    response = `Section not found: "${arg}". Try 'ls' to see sections.`;
+                    response = `Section not found: "${arg}". Try 'ls'.`;
                 }
                 break;
 
@@ -264,26 +272,137 @@ document.addEventListener("DOMContentLoaded", function() {
             case 'lebron':
                 const img = document.createElement('img');
                 img.src = 'lebron.png';
-                img.alt = 'LeBron James, the GOAT, in the multiverse';
+                img.alt = 'LeBron James';
                 img.className = 'terminal-image';
                 terminalBody.appendChild(img);
                 break;
 
+            // === GAME COMMAND ===
+            case 'game':
+            case 'snake':
+                startGame();
+                break;
+
             default:
-                response = `Command not found: "${command}". Type 'help' for options.`;
+                response = `Command not found: "${command}". Type 'help'.`;
                 break;
         }
         
         if(response) printToTerminal(response);
     }
 
-    // Helper function to print to terminal
     function printToTerminal(message) {
-        playSound('success'); // <--- TRIGGER SOUND EFFECT
+        playSound('success');
         const output = document.createElement('p');
         output.innerHTML = message;
         terminalBody.appendChild(output);
         terminalBody.scrollTop = terminalBody.scrollHeight;
+    }
+
+    /* --- SNAKE GAME LOGIC --- */
+    function startGame() {
+        gameRunning = true;
+        score = 0;
+        snake = [{x: 10, y: 10}]; // Start in middle
+        direction = 'right';
+        nextDirection = 'right';
+        
+        // Clear terminal for the game
+        const initialMessages = document.querySelectorAll('.terminal-body p');
+        for(let i = initialMessages.length - 1; i >= 0; i--) { initialMessages[i].remove(); }
+
+        // Create Board
+        const board = document.createElement('div');
+        board.id = 'snake-board';
+        terminalBody.appendChild(board);
+        
+        // Create Instructions
+        const info = document.createElement('p');
+        info.id = 'game-info';
+        info.innerHTML = "CONTROLS: Arrow Keys to Move. Score: 0";
+        terminalBody.appendChild(info);
+
+        terminalInput.blur(); // Remove focus from input
+        spawnFood();
+        gameInterval = setInterval(updateGame, 100); // Game Loop speed
+    }
+
+    function spawnFood() {
+        food = {
+            x: Math.floor(Math.random() * 20) + 1,
+            y: Math.floor(Math.random() * 20) + 1
+        };
+        // Don't spawn on snake body
+        for (let part of snake) {
+            if (part.x === food.x && part.y === food.y) spawnFood();
+        }
+    }
+
+    function updateGame() {
+        direction = nextDirection;
+        const head = { ...snake[0] };
+
+        if (direction === 'right') head.x++;
+        if (direction === 'left') head.x--;
+        if (direction === 'up') head.y--; // Grid starts top-left
+        if (direction === 'down') head.y++;
+
+        // Collision Check (Walls or Self)
+        if (head.x > 20 || head.x < 1 || head.y > 20 || head.y < 1 || snake.some(part => part.x === head.x && part.y === head.y)) {
+            endGame();
+            return;
+        }
+
+        snake.unshift(head); // Add new head
+
+        // Check if ate food
+        if (head.x === food.x && head.y === food.y) {
+            score += 10;
+            document.getElementById('game-info').innerHTML = `CONTROLS: Arrow Keys. Score: ${score}`;
+            playSound('eat'); // Eat sound
+            spawnFood();
+        } else {
+            snake.pop(); // Remove tail if not eating
+        }
+
+        drawGame();
+    }
+
+    function drawGame() {
+        const board = document.getElementById('snake-board');
+        if(!board) return;
+        board.innerHTML = ''; // Clear board
+
+        // Draw Snake
+        snake.forEach(part => {
+            const snakeElement = document.createElement('div');
+            snakeElement.style.gridRowStart = part.y;
+            snakeElement.style.gridColumnStart = part.x;
+            snakeElement.classList.add('snake-cell', 'snake-body');
+            board.appendChild(snakeElement);
+        });
+
+        // Draw Food
+        const foodElement = document.createElement('div');
+        foodElement.style.gridRowStart = food.y;
+        foodElement.style.gridColumnStart = food.x;
+        foodElement.classList.add('snake-cell', 'snake-food');
+        board.appendChild(foodElement);
+    }
+
+    function endGame() {
+        clearInterval(gameInterval);
+        gameRunning = false;
+        playSound('fail');
+        
+        const board = document.getElementById('snake-board');
+        if(board) board.remove();
+        const info = document.getElementById('game-info');
+        if(info) info.remove();
+
+        printToTerminal(`GAME OVER. Final Score: ${score}`);
+        printToTerminal("Type 'game' to play again.");
+        terminalInput.focus();
     }
 
 }); // End of "DOMContentLoaded"
