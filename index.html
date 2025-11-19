@@ -4,13 +4,48 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Alistair Westbrook | Portfolio</title>
+    
     <link rel="icon" type="image/png" href="favicon.png">
+
     <link rel="stylesheet" href="styles.css"> 
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
 </head>
 <body>
-    <!-- Background -->
     <div id="vanta-bg"></div>
+
+    <div id="system-hud">
+        <div class="hud-header">SYS_DIAGNOSTICS_V.1.0</div>
+        
+        <div class="hud-row">
+            <span class="hud-label">CPU_TEMP</span>
+            <span class="hud-value" id="cpu-temp">42°C</span>
+        </div>
+
+        <div class="hud-row">
+            <span class="hud-label">SOLIDWORKS / CAD</span>
+            <div class="hud-bar-container">
+                <div class="hud-bar" id="bar-cad"></div>
+            </div>
+        </div>
+
+        <div class="hud-row">
+            <span class="hud-label">REACT / JS / WEB</span>
+            <div class="hud-bar-container">
+                <div class="hud-bar" id="bar-react"></div>
+            </div>
+        </div>
+
+        <div class="hud-row">
+            <span class="hud-label">ESP32 / C++ / IOT</span>
+            <div class="hud-bar-container">
+                <div class="hud-bar" id="bar-cpp"></div>
+            </div>
+        </div>
+
+        <div class="hud-footer">
+            STATUS: <span style="color: #00ff00;">ONLINE</span>
+        </div>
+    </div>
 
     <nav>
         <a href="#home">/home</a>
@@ -19,7 +54,6 @@
         <a href="#achievements">/achievements</a>
     </nav>
 
-    <!-- Main Home/Terminal Section -->
     <main id="home">
         <div class="terminal">
             <div class="terminal-header">
@@ -31,14 +65,20 @@
                 <p>> Welcome, user.</p>
                 <p>> <span id="typed-text"></span></p>
                 
-                <!-- Loading Bar (starts hidden) -->
                 <div id="loading-bar" style="display: none;">
                     <p>Initializing Interface... [ <span id="loading-squares"></span> ]</p>
                 </div>
                 
-                <!-- This is where command output will go -->
-            </div>
-            <!-- Interactive input (starts hidden) -->
+                <div id="cad-overlay" style="display: none;">
+                    <div id="cad-controls">
+                        <span>VIEWER_MODE: WIREFRAME_RENDER</span>
+                        <button onclick="window.closeCad()">[X] CLOSE</button>
+                    </div>
+                    <div id="cad-canvas-container"></div>
+                </div>
+
+                </div>
+            
             <div class="prompt-line" style="display: none;">
                 <span class="prompt-user">> GUEST:</span>
                 <input type="text" id="terminal-input" autocomplete="off" autofocus>
@@ -46,108 +86,64 @@
         </div>
     </main>
 
-    <!-- 
-      ================================================
-      === "ABOUT ME" SECTION (Cleaned Text) ===
-      ================================================
-    -->
     <section id="about">
         <h2>/About Me</h2>
-        
         <div class="module-container">
             <div class="module-header">
                 <span class="module-header-title">Alistair Westbrook</span>
                 <span class="module-header-info">UNL MECH. ENGINEERING '29</span>
             </div>
             <div class="module-content" style="align-items: flex-start; text-align: left;">
-                
                 <blockquote>
                     Hello! I'm a freshman <strong>Mechanical Engineering student at the University of Nebraska-Lincoln</strong> with a strong passion for the <strong>automotive sector</strong>.
                 </blockquote>
-
                 <p style="color: var(--text-color);">
                     My real passion is at the intersection of hardware and software. I'm a builder at heart, whether I'm prototyping physical components as a member of the <strong>Baja SAE team</strong> or building a full-stack web application from scratch.
                 </p>
                 <p style="color: var(--text-color);">
-                    This "hands-on" approach is what led my hackathon team to win 2nd place for <strong>Terraflo Analytics</strong>, and it's what drove me to build <strong>Differdle.com</strong>, a calculus-based web game.
+                    This "hands-on" approach is what led my hackathon team to win 2nd place for <strong>Terraflo Analytics</strong>, and it's what drove me to build <strong>Differdle.com</strong>.
                 </p>
-                <p style="color: var(--text-color);">
-                    Outside of my personal projects, I've developed strong <strong>leadership and training skills</strong> in fast-paced work environments, having trained new teams at both Raising Cane's and Charleys. I thrive on solving complex problems and am always looking for the next challenge.
-                </p>
-
                 <a href="resume.pdf" download="Alistair_Westbrook_Resume" class="cta-button" style="margin-top: 15px;">
                     Download Resume (PDF)
                 </a>
-
-                <div class="project-details">
-                    <p><strong>Quick Facts:</strong><br>
-                       - <strong>Major:</strong> B.S. Mechanical Engineering<br>
-                       - <strong>Certifications:</strong> Entrepreneurship and Small Business<br>
-                       - <strong>Key Skills:</strong> Prototyping, Leadership, Web Development, Hardware Integration
-                    </p>
-                </div>
             </div>
         </div>
     </section>
 
-    <!-- Projects Section -->
     <section id="projects">
         <h2>/Projects</h2>
         
-        <!-- Project 01: Terraflo Analytics -->
         <div class="module-container">
             <div class="module-header">
                 <span class="module-header-title">Terraflo Analytics</span>
                 <span class="module-header-info">TYPE: AI / HARDWARE</span>
             </div>
             <div class="module-content">
-                
-                <img src="terraflo.jpg" alt="The Terraflo Analytics hydroponics project" class="project-image">
-                
+                <img src="terraflo.jpg" alt="Terraflo Analytics" class="project-image">
                 <blockquote>
-                    An AI-powered hydroponic sensor device that collects data and stores it on a dashboard. It plots the data and gives insights based off trends and changes. It has the ability for module plug-and-play of other sensors and can be implemented in soil-based grows.
+                    An AI-powered hydroponic sensor device that collects data and stores it on a dashboard. 
                 </blockquote>
-                
                 <a href="https://cornhacks20.vercel.app/" target="_blank" class="cta-button">View Live Demo</a>
-                
                 <div class="project-details">
-                    <p><strong>Demo Login:</strong><br>
-                       username: Alistair<br>
-                       password: Alistair
-                    </p>
-                    <p><strong>Team Members:</strong><br>
-                       Macy Sweet-Bemer, Thomas Markxsen, Alistair Westbrook
-                    </p>
+                    <p><strong>Demo Login:</strong> Alistair / Alistair</p>
                 </div>
-                
             </div>
         </div>
 
-        <!-- Project 02: Differdle -->
         <div class="module-container">
             <div class="module-header">
                 <span class="module-header-title">Differdle.com</span>
                 <span class="module-header-info">TYPE: WEB APP / GAME</span>
             </div>
             <div class="module-content">
-                
                 <blockquote>
                     A calculus-based web game that gamifies the process of solving derivatives.
                 </blockquote>
-                
                 <a href="https://Differdle.com" target="_blank" class="cta-button">Play Differdle</a>
-                
-                <div class="project-details">
-                    <p><strong>Stack:</strong><br>
-                       (e.g., React, JavaScript, HTML/CSS)
-                    </p>
-                </div>
             </div>
         </div>
-                
     </section>
 
-    <!-- Achievements Section -->
     <section id="achievements">
         <h2>/Achievements</h2>
         <div class="module-container">
@@ -161,11 +157,6 @@
         </div>
     </section>
 
-    <!-- 
-      ================================================
-      === FOOTER SECTION ===
-      ================================================
-    -->
     <footer>
         <a href="https://github.com/AlistairWstbrk" target="_blank">GitHub</a>
         <span>//</span>
@@ -174,8 +165,6 @@
         <a href="mailto:Westbrook.alistair@gmail.com">Gmail</a>
     </footer>
 
-
-    <!-- SCRIPT SECTION -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.net.min.js"></script>
     <script src="https://unpkg.com/typed.js@2.1.0/dist/typed.umd.js"></script>
