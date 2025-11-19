@@ -205,12 +205,51 @@ document.addEventListener("DOMContentLoaded", function() {
         if(response) printToTerminal(response);
     }
 
-    // Helper function to print to terminal
+   // Helper function to print to terminal
     function printToTerminal(message) {
+        playSound('success'); // <--- NEW LINE: Play sound
         const output = document.createElement('p');
         output.innerHTML = message;
         terminalBody.appendChild(output);
         terminalBody.scrollTop = terminalBody.scrollHeight;
     }
+    /* =================================================================== */
+/* 6. AUDIO SYNTHESIS (The "Gemini 3" Upgrade)
+/* Generates sci-fi sounds using the Web Audio API. No files needed.
+/* =================================================================== */
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-}); // End of "DOMContentLoaded"
+function playSound(type) {
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    const osc = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+    
+    osc.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+
+    if (type === 'key') {
+        // Subtle typing click
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.03);
+        gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.03);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.03);
+    } else if (type === 'success') {
+        // "Access Granted" Chime
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+        osc.frequency.setValueAtTime(880, audioCtx.currentTime + 0.1);
+        gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
+        gainNode.gain.linearRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.3);
+    }
+}
+
+// Attach sound to typing
+document.getElementById('terminal-input').addEventListener('input', () => {
+    playSound('key');
+});
+
