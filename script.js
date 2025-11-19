@@ -16,18 +16,28 @@ document.addEventListener("DOMContentLoaded", function() {
         if (audioCtx.state === 'suspended') audioCtx.resume();
         const osc = audioCtx.createOscillator();
         const gainNode = audioCtx.createGain();
+        
         osc.connect(gainNode);
         gainNode.connect(audioCtx.destination);
 
         if (type === 'key') {
-            osc.type = 'triangle';
-            osc.frequency.setValueAtTime(600, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.05);
-            gainNode.gain.setValueAtTime(0.03, audioCtx.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+            // === NEW MECHANICAL CLICK SOUND ===
+            // Uses a square wave for a "sharper" click
+            osc.type = 'square'; 
+            
+            // Quick frequency drop simulates the "tactile bump"
+            osc.frequency.setValueAtTime(300, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(50, audioCtx.currentTime + 0.03);
+            
+            // Very short duration (snappy)
+            gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.03);
+            
             osc.start();
-            osc.stop(audioCtx.currentTime + 0.05);
+            osc.stop(audioCtx.currentTime + 0.03);
+            
         } else if (type === 'success') {
+            // "Access Granted" Chime (Unchanged)
             osc.type = 'sine';
             osc.frequency.setValueAtTime(500, audioCtx.currentTime);
             osc.frequency.linearRampToValueAtTime(1000, audioCtx.currentTime + 0.1);
@@ -125,9 +135,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 
                 document.querySelector('.prompt-line').style.display = 'flex';
                 document.getElementById('terminal-input').focus();
-                
-                // START THE HUD ANIMATION NOW
-                startHudAnimation();
             }
         }, 150);
     }
@@ -259,7 +266,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     /* =================================================================== */
-    /* 6. HOLOGRAPHIC CAD VIEWER
+    /* 6. HOLOGRAPHIC CAD VIEWER (WITH STL LOADER)
     /* =================================================================== */
     window.closeCad = function() {
         document.getElementById('cad-overlay').style.display = 'none';
@@ -278,23 +285,49 @@ document.addEventListener("DOMContentLoaded", function() {
         cadScene.fog = new THREE.FogExp2(0x000000, 0.05);
 
         cadCamera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
-        cadCamera.position.z = 5;
+        cadCamera.position.z = 100; // Move camera back for large STL files
 
         cadRenderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
         cadRenderer.setSize(container.clientWidth, container.clientHeight);
         container.appendChild(cadRenderer.domElement);
 
-        const geometry = new THREE.TorusKnotGeometry(1.5, 0.4, 100, 16);
-        const material = new THREE.MeshBasicMaterial({ 
-            color: 0x00ffff, 
-            wireframe: true,
-            transparent: true,
-            opacity: 0.8
-        });
+        // === LOAD THE STL FILE ===
+        const loader = new THREE.STLLoader();
+        loader.load(
+            'project.stl', // Ensure your file is named exactly this
+            function (geometry) {
+                // Center the geometry
+                geometry.center();
 
-        cadMesh = new THREE.Mesh(geometry, material);
-        cadScene.add(cadMesh);
+                // Create Material
+                const material = new THREE.MeshBasicMaterial({ 
+                    color: 0x00ffff, 
+                    wireframe: true,
+                    transparent: true,
+                    opacity: 0.8
+                });
 
+                cadMesh = new THREE.Mesh(geometry, material);
+                
+                // STL files are often huge or tiny. Adjust scale here if needed.
+                // If your object is invisible, try changing these to 1, 1, 1 or 100, 100, 100
+                cadMesh.scale.set(0.5, 0.5, 0.5); 
+                
+                // Rotate it upright (STLs often export rotated)
+                cadMesh.rotation.x = -Math.PI / 2;
+
+                cadScene.add(cadMesh);
+            },
+            (xhr) => {
+                console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+            },
+            (error) => {
+                console.error("Error loading STL:", error);
+                printToTerminal("ERROR: project.stl not found. Please export your CAD file.");
+            }
+        );
+
+        // Lights
         const light = new THREE.PointLight(0xffffff, 1, 100);
         light.position.set(10, 10, 10);
         cadScene.add(light);
@@ -307,13 +340,13 @@ document.addEventListener("DOMContentLoaded", function() {
         container.addEventListener('mousedown', (e) => { isDragging = true; });
         container.addEventListener('mouseup', (e) => { isDragging = false; });
         container.addEventListener('mousemove', (e) => {
-            if (isDragging) {
+            if (isDragging && cadMesh) {
                 const deltaMove = {
                     x: e.offsetX - previousMousePosition.x,
                     y: e.offsetY - previousMousePosition.y
                 };
-                cadMesh.rotation.y += deltaMove.x * 0.01;
-                cadMesh.rotation.x += deltaMove.y * 0.01;
+                cadMesh.rotation.z -= deltaMove.x * 0.01; // Z rotation for STL usually
+                cadMesh.rotation.x -= deltaMove.y * 0.01;
             }
             previousMousePosition = { x: e.offsetX, y: e.offsetY };
         });
@@ -322,8 +355,8 @@ document.addEventListener("DOMContentLoaded", function() {
     function animateCad() {
         cadAnimationId = requestAnimationFrame(animateCad);
         if(cadMesh) {
-            cadMesh.rotation.x += 0.005;
-            cadMesh.rotation.y += 0.005;
+            // Slow auto-rotation
+            cadMesh.rotation.z += 0.002;
         }
         cadRenderer.render(cadScene, cadCamera);
     }
@@ -338,32 +371,7 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     /* =================================================================== */
-    /* 7. SYSTEM HUD ANIMATION
-    /* =================================================================== */
-    function startHudAnimation() {
-        const barCad = document.getElementById('bar-cad');
-        const barReact = document.getElementById('bar-react');
-        const barCpp = document.getElementById('bar-cpp');
-        const cpuTemp = document.getElementById('cpu-temp');
-
-        setTimeout(() => { barCad.style.width = "90%"; }, 500);
-        setTimeout(() => { barReact.style.width = "75%"; }, 800);
-        setTimeout(() => { barCpp.style.width = "85%"; }, 1100);
-
-        setInterval(() => {
-            barCad.style.width = (90 + Math.random() * 5 - 2.5) + "%";
-            barReact.style.width = (75 + Math.random() * 5 - 2.5) + "%";
-            barCpp.style.width = (85 + Math.random() * 5 - 2.5) + "%";
-
-            let temp = 40 + Math.floor(Math.random() * 15);
-            cpuTemp.innerText = temp + "°C";
-            if (temp > 50) cpuTemp.style.color = "red";
-            else cpuTemp.style.color = "var(--text-color)";
-        }, 2000);
-    }
-
-    /* =================================================================== */
-    /* 8. SNAKE GAME LOGIC
+    /* 7. SNAKE GAME LOGIC
     /* =================================================================== */
     let snake = [], food = {}, direction = 'right', nextDirection = 'right', score = 0, gameInterval;
 
