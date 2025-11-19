@@ -421,5 +421,39 @@ document.addEventListener("DOMContentLoaded", function() {
         const info = document.getElementById('game-info'); if(info) info.remove();
         printToTerminal(`GAME OVER. Final Score: ${score}`); printToTerminal("Type 'game' to play again."); terminalInput.focus();
     }
+    /* =================================================================== */
+    /* 9. HACKER TEXT DECRYPTION EFFECT
+    /* =================================================================== */
+    const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890@#$%^&*";
+
+    // Select all elements with the 'hacker-text' class
+    document.querySelectorAll(".hacker-text").forEach(element => {
+        
+        element.addEventListener("mouseover", event => {  
+            let iteration = 0;
+            const originalText = event.target.dataset.value; // Get original text
+            
+            clearInterval(event.target.interval);
+            
+            event.target.interval = setInterval(() => {
+                event.target.innerText = event.target.innerText
+                    .split("")
+                    .map((letter, index) => {
+                        if(index < iteration) {
+                            return originalText[index];
+                        }
+                        return letters[Math.floor(Math.random() * 26)];
+                    })
+                    .join("");
+                
+                if(iteration >= originalText.length){ 
+                    clearInterval(event.target.interval);
+                }
+                
+                // Controls speed of decryption (higher += faster)
+                iteration += 1 / 3; 
+            }, 30);
+        });
+    });
 
 }); // End of "DOMContentLoaded"
