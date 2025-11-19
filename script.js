@@ -13,21 +13,15 @@ document.addEventListener("DOMContentLoaded", function() {
     /* 0. SKIP INTRO FUNCTION
     /* =================================================================== */
     window.skipIntro = function() {
-        // Stop animations
         if (typedInstance) typedInstance.destroy();
         if (loadingInterval) clearInterval(loadingInterval);
 
-        // Hide Loading UI
         document.getElementById('typed-text').innerHTML = "Access granted.";
         document.getElementById('loading-bar').style.display = 'none';
         document.getElementById('skip-btn').style.display = 'none';
 
-        // Show Terminal UI immediately
         const terminalBody = document.querySelector('.terminal-body');
-        
-        // Clean up old messages
         const oldPs = terminalBody.querySelectorAll('p');
-        
         const welcome = document.createElement('p');
         welcome.innerHTML = "Welcome, user.";
         terminalBody.appendChild(welcome);
@@ -41,19 +35,18 @@ document.addEventListener("DOMContentLoaded", function() {
     };
 
     /* =================================================================== */
-    /* 1. CAD FILE REGISTRY (EDIT THIS!)
+    /* 1. CAD FILE REGISTRY
     /* =================================================================== */
     const cadFiles = {
         'enclosure': { 
             file: 'project.stl', 
             description: 'Terraflo Main Enclosure (v2)' 
         },
-        // Example of adding more files:
-        // 'chassis': { file: 'chassis.stl', description: 'Baja SAE Front Suspension' },
+        // Add more files here as needed
     };
 
     /* =================================================================== */
-    /* 2. Vanta.js (Background)
+    /* 2. Vanta.js
     /* =================================================================== */
     let vantaEffect = VANTA.NET({
         el: "#vanta-bg",
@@ -72,7 +65,7 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     /* =================================================================== */
-    /* 3. Konami Code (Hacker Mode)
+    /* 3. Konami Code
     /* =================================================================== */
     const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
     let konamiIndex = 0;
@@ -95,7 +88,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     /* =================================================================== */
-    /* 4. Typed.js & Loading Bar
+    /* 4. Typed.js & Loading
     /* =================================================================== */
     var options = {
         strings: ["Initializing portfolio interface...", "Loading modules..."],
@@ -120,7 +113,6 @@ document.addEventListener("DOMContentLoaded", function() {
             square.className = 'loading-square';
             loadingSquares.appendChild(square);
         }
-
         loadingInterval = setInterval(() => {
             if (currentSquare < numSquares) {
                 loadingSquares.children[currentSquare].classList.add('filled');
@@ -129,10 +121,8 @@ document.addEventListener("DOMContentLoaded", function() {
                 clearInterval(loadingInterval);
                 document.getElementById('loading-bar').style.display = 'none';
                 document.getElementById('skip-btn').style.display = 'none';
-                
                 printToTerminal("Access granted. Welcome, user.");
                 printToTerminal("Type 'help' to view commands.");
-                
                 document.querySelector('.prompt-line').style.display = 'flex';
                 document.getElementById('terminal-input').focus();
             }
@@ -188,7 +178,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     response = fileList;
                 } else if (cadFiles[arg]) {
                     launchCadViewer(cadFiles[arg].file);
-                    return; // Don't print text, just launch
+                    return; 
                 } else {
                     response = `File '${arg}' not found. Type 'cad' for list.`;
                 }
@@ -267,12 +257,20 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     /* =================================================================== */
-    /* 6. HOLOGRAPHIC CAD VIEWER (Auto-Center + No HUD Logic)
+    /* 6. HOLOGRAPHIC CAD VIEWER (With Wireframe Toggle)
     /* =================================================================== */
     window.closeCad = function() {
         document.getElementById('cad-overlay').style.display = 'none';
         if (cadAnimationId) cancelAnimationFrame(cadAnimationId);
         printToTerminal("CAD Viewer Terminated.");
+    };
+
+    // === NEW TOGGLE FUNCTION ===
+    window.toggleWireframe = function() {
+        if(cadMesh && cadMesh.material) {
+            // Invert the wireframe boolean
+            cadMesh.material.wireframe = !cadMesh.material.wireframe;
+        }
     };
 
     function launchCadViewer(filename) {
@@ -309,7 +307,6 @@ document.addEventListener("DOMContentLoaded", function() {
         printToTerminal(`Loading ${filename}...`);
         
         loader.load(filename, function (geometry) {
-            // === AUTO-CENTER & SCALE LOGIC ===
             geometry.computeBoundingBox();
             geometry.center(); 
 
@@ -317,12 +314,14 @@ document.addEventListener("DOMContentLoaded", function() {
             const size = new THREE.Vector3();
             boundingBox.getSize(size);
             const maxDim = Math.max(size.x, size.y, size.z);
-            
-            // Scale so max dimension is approx 10 units
             const scaleFactor = 10 / maxDim;
 
             const material = new THREE.MeshStandardMaterial({ 
-                color: 0xaaaaaa, roughness: 0.5, metalness: 0.5, side: THREE.DoubleSide
+                color: 0xaaaaaa, 
+                roughness: 0.5, 
+                metalness: 0.5, 
+                side: THREE.DoubleSide,
+                wireframe: false // Start solid
             });
             cadMesh = new THREE.Mesh(geometry, material);
             
@@ -349,6 +348,8 @@ document.addEventListener("DOMContentLoaded", function() {
                 const deltaMove = { x: e.offsetX - previousMousePosition.x, y: e.offsetY - previousMousePosition.y };
                 cadMesh.rotation.z -= deltaMove.x * 0.01;
                 cadMesh.rotation.x -= deltaMove.y * 0.01;
+                document.getElementById('rot-val').innerText = 
+                    `${cadMesh.rotation.x.toFixed(1)}, ${cadMesh.rotation.y.toFixed(1)}, ${cadMesh.rotation.z.toFixed(1)}`;
             }
             previousMousePosition = { x: e.offsetX, y: e.offsetY };
         });
