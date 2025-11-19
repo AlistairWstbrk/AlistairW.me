@@ -32,14 +32,6 @@
                 <div id="loading-bar" style="display: none;">
                     <p>Initializing Interface... [ <span id="loading-squares"></span> ]</p>
                 </div>
-                
-                <div id="cad-overlay" style="display: none;">
-                    <div id="cad-controls">
-                        <span>VIEWER_MODE: PROJECT.STL</span>
-                        <button onclick="window.closeCad()">[X] CLOSE</button>
-                    </div>
-                    <div id="cad-canvas-container"></div>
-                </div>
 
                 </div>
             
@@ -64,9 +56,6 @@
                 <p style="color: var(--text-color);">
                     My real passion is at the intersection of hardware and software. I'm a builder at heart, whether I'm prototyping physical components as a member of the <strong>Baja SAE team</strong> or building a full-stack web application from scratch.
                 </p>
-                <p style="color: var(--text-color);">
-                    This "hands-on" approach is what led my hackathon team to win 2nd place for <strong>Terraflo Analytics</strong>, and it's what drove me to build <strong>Differdle.com</strong>.
-                </p>
                 <a href="resume.pdf" download="Alistair_Westbrook_Resume" class="cta-button" style="margin-top: 15px;">
                     Download Resume (PDF)
                 </a>
@@ -84,7 +73,7 @@
             <div class="module-content">
                 <img src="terraflo.jpg" alt="Terraflo Analytics" class="project-image">
                 <blockquote>
-                    An AI-powered hydroponic sensor device that collects data and stores it on a dashboard. It plots the data and gives insights based off trends and changes. It has the ability for module plug-and-play of other sensors and can be implemented in soil-based grows. 
+                    An AI-powered hydroponic sensor device that collects data and stores it on a dashboard. 
                 </blockquote>
                 <a href="https://cornhacks20.vercel.app/" target="_blank" class="cta-button">View Live Demo</a>
                 <div class="project-details">
@@ -127,6 +116,16 @@
         <span>//</span>
         <a href="mailto:Westbrook.alistair@gmail.com">Gmail</a>
     </footer>
+
+    <div id="cad-overlay" style="display: none;">
+        <div id="cad-window">
+            <div id="cad-controls">
+                <span id="cad-title-text">VIEWER_MODE: STANDBY</span>
+                <button onclick="window.closeCad()">[X] CLOSE_WINDOW</button>
+            </div>
+            <div id="cad-canvas-container"></div>
+        </div>
+    </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/loaders/STLLoader.js"></script>
