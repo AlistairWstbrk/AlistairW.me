@@ -27,57 +27,6 @@ body, html {
     left: 0;
 }
 
-/* === SYSTEM HUD STYLES === */
-#system-hud {
-    position: fixed;
-    top: 100px;
-    right: 20px;
-    width: 220px;
-    background-color: rgba(0, 0, 0, 0.8);
-    border: 1px solid var(--primary-color);
-    padding: 15px;
-    z-index: 100;
-    font-family: 'Share Tech Mono', monospace;
-    box-shadow: 0 0 15px rgba(255, 149, 0, 0.2);
-    backdrop-filter: blur(5px);
-    /* Hide on mobile */
-    display: none; 
-}
-@media (min-width: 1000px) {
-    #system-hud { display: block; }
-}
-.hud-header {
-    border-bottom: 1px solid var(--border-color);
-    margin-bottom: 10px;
-    font-size: 0.8rem;
-    color: var(--text-color);
-    padding-bottom: 5px;
-}
-.hud-row { margin-bottom: 8px; font-size: 0.8rem; }
-.hud-label { display: block; color: var(--primary-color); margin-bottom: 2px; }
-.hud-value { float: right; color: var(--text-color); }
-.hud-bar-container {
-    width: 100%;
-    height: 6px;
-    background-color: #333;
-    position: relative;
-}
-.hud-bar {
-    height: 100%;
-    background-color: var(--primary-color);
-    width: 0%; /* Animated by JS */
-    box-shadow: 0 0 5px var(--primary-color);
-    transition: width 0.5s ease-out;
-}
-.hud-footer {
-    margin-top: 15px;
-    font-size: 0.7rem;
-    text-align: right;
-    color: #555;
-    border-top: 1px solid #333;
-    padding-top: 5px;
-}
-
 /* === NAV === */
 nav {
     padding: 10px;
@@ -118,7 +67,7 @@ main {
     box-shadow: 0 0 20px rgba(255, 149, 0, 0.5);
     backdrop-filter: blur(3px);
     z-index: 10;
-    position: relative; /* For CAD overlay */
+    position: relative;
 }
 .terminal-header {
     background-color: var(--border-color);
@@ -227,8 +176,6 @@ section h2 {
     align-items: center;
     justify-content: center;
 }
-
-/* === PROJECT ASSETS === */
 .project-image {
     width: 100%;
     max-width: 450px;
