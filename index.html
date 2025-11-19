@@ -33,6 +33,8 @@
                     <p>Initializing Interface... [ <span id="loading-squares"></span> ]</p>
                 </div>
 
+                <button id="skip-btn" onclick="skipIntro()">[SKIP_INTRO]</button>
+
                 </div>
             
             <div class="prompt-line" style="display: none;">
@@ -123,7 +125,22 @@
                 <span id="cad-title-text">VIEWER_MODE: STANDBY</span>
                 <button onclick="window.closeCad()">[X] CLOSE_WINDOW</button>
             </div>
+            
             <div id="cad-canvas-container"></div>
+
+            <div id="cad-overlay-ui">
+                <div class="hud-crosshair-center">+</div>
+                <div class="hud-corner-tl"></div>
+                <div class="hud-corner-tr"></div>
+                <div class="hud-corner-bl"></div>
+                <div class="hud-corner-br"></div>
+                <div class="hud-grid-lines"></div>
+                <div class="hud-text-l">
+                    ROTATION: <span id="rot-val">0,0,0</span><br>
+                    SCALE: 1:1<br>
+                    GRID: ON
+                </div>
+            </div>
         </div>
     </div>
 
