@@ -3,6 +3,10 @@
 /* =================================================================== */
 document.addEventListener("DOMContentLoaded", function() {
 
+    /* --- GLOBAL VARIABLES FOR CAD --- */
+    let cadRenderer, cadScene, cadCamera, cadAnimationId;
+    let cadMesh;
+
     /* =================================================================== */
     /* 1. AUDIO SYNTHESIS
     /* =================================================================== */
@@ -31,27 +35,11 @@ document.addEventListener("DOMContentLoaded", function() {
             gainNode.gain.linearRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
             osc.start();
             osc.stop(audioCtx.currentTime + 0.3);
-        } else if (type === 'fail') { // New Fail Sound
-            osc.type = 'sawtooth';
-            osc.frequency.setValueAtTime(150, audioCtx.currentTime);
-            osc.frequency.linearRampToValueAtTime(50, audioCtx.currentTime + 0.3);
-            gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
-            gainNode.gain.linearRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.3);
-        } else if (type === 'eat') { // New Eat Sound
-            osc.type = 'square';
-            osc.frequency.setValueAtTime(800, audioCtx.currentTime);
-            osc.frequency.setValueAtTime(1200, audioCtx.currentTime + 0.05);
-            gainNode.gain.setValueAtTime(0.03, audioCtx.currentTime);
-            gainNode.gain.linearRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.1);
         }
     }
 
     /* =================================================================== */
-    /* 2. Vanta.js Script
+    /* 2. Vanta.js
     /* =================================================================== */
     let vantaEffect = VANTA.NET({
         el: "#vanta-bg",
@@ -62,21 +50,20 @@ document.addEventListener("DOMContentLoaded", function() {
         minWidth: 200.00,
         scale: 1.00,
         scaleMobile: 1.00,
-        color: 0xff9500, // Orange
-        backgroundColor: 0x0, // Black
+        color: 0xff9500, 
+        backgroundColor: 0x0, 
         points: 10.00,
         maxDistance: 25.00,
         spacing: 20.00
     });
 
     /* =================================================================== */
-    /* 3. Konami Code Listener
+    /* 3. Konami Code
     /* =================================================================== */
     const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
     let konamiIndex = 0;
 
     document.addEventListener('keydown', (e) => {
-        // Only check konami if game is NOT running to avoid conflict
         if (!gameRunning && e.key === konamiCode[konamiIndex]) {
             konamiIndex++;
             if (konamiIndex === konamiCode.length) {
@@ -98,7 +85,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     /* =================================================================== */
-    /* 4. Typed.js Script
+    /* 4. Typed.js & Loading
     /* =================================================================== */
     var options = {
         strings: ["Initializing portfolio interface...", "Loading modules..."],
@@ -113,11 +100,7 @@ document.addEventListener("DOMContentLoaded", function() {
     };
     var typed = new Typed('#typed-text', options);
 
-    /* =================================================================== */
-    /* 5. Loading Bar Function
-    /* =================================================================== */
     const loadingSquares = document.getElementById('loading-squares');
-    const terminalBody = document.querySelector('.terminal-body');
     const numSquares = 10;
     let currentSquare = 0;
 
@@ -136,34 +119,30 @@ document.addEventListener("DOMContentLoaded", function() {
             } else {
                 clearInterval(fillInterval);
                 document.getElementById('loading-bar').style.display = 'none';
+                
                 printToTerminal("Access granted. Welcome, user.");
-                printToTerminal("Type 'help' for a list of commands.");
+                printToTerminal("Type 'help' or 'cad' to begin.");
+                
                 document.querySelector('.prompt-line').style.display = 'flex';
                 document.getElementById('terminal-input').focus();
+                
+                // START THE HUD ANIMATION NOW
+                startHudAnimation();
             }
         }, 150);
     }
 
     /* =================================================================== */
-    /* 6. TERMINAL & GAME ENGINE
+    /* 5. TERMINAL LOGIC
     /* =================================================================== */
     const terminalInput = document.getElementById('terminal-input');
+    const terminalBody = document.querySelector('.terminal-body');
     let gameRunning = false;
-    let gameInterval;
-    let snake = [];
-    let food = {};
-    let direction = 'right';
-    let nextDirection = 'right';
-    let score = 0;
 
-    // Typing sounds
     terminalInput.addEventListener('input', () => playSound('key'));
 
-    // Main Input Handler
     terminalInput.addEventListener('keydown', function(event) {
-        // If game is running, prevent default terminal behavior for arrows
         if (gameRunning) return;
-
         if (event.key === 'Enter') {
             event.preventDefault();
             const command = terminalInput.value.trim().toLowerCase();
@@ -171,23 +150,6 @@ document.addEventListener("DOMContentLoaded", function() {
             processCommand(command);
             terminalInput.value = '';
             terminalBody.scrollTop = terminalBody.scrollHeight;
-        }
-    });
-
-    // Global key listener for Game Controls
-    document.addEventListener('keydown', (e) => {
-        if (gameRunning) {
-            // Prevent scrolling with arrow keys
-            if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].indexOf(e.code) > -1) {
-                e.preventDefault();
-            }
-            
-            switch(e.key) {
-                case 'ArrowUp': if (direction !== 'down') nextDirection = 'up'; break;
-                case 'ArrowDown': if (direction !== 'up') nextDirection = 'down'; break;
-                case 'ArrowLeft': if (direction !== 'right') nextDirection = 'left'; break;
-                case 'ArrowRight': if (direction !== 'left') nextDirection = 'right'; break;
-            }
         }
     });
 
@@ -200,8 +162,8 @@ document.addEventListener("DOMContentLoaded", function() {
         switch (baseCommand) {
             case 'help':
                 response = "Available commands: <br>" +
-                           "[help] - Show this message<br>" +
-                           "[game] - Play Snake <span style='color:#fff'>(NEW!)</span><br>" +
+                           "[cad] - Launch Holographic CAD Viewer <span style='color:#fff'>(NEW!)</span><br>" +
+                           "[game] - Play Snake<br>" +
                            "[whoami] - Bio<br>" +
                            "[socials] - Links<br>" +
                            "[resume] - Download PDF<br>" + 
@@ -211,16 +173,18 @@ document.addEventListener("DOMContentLoaded", function() {
                            "[clear] - Clear<br>" +
                            "[lebron] - The GOAT";
                 break;
-            
+
+            case 'cad':
+            case 'prototype':
+                launchCadViewer();
+                return;
+
             case 'whoami':
-                response = "Alistair Westbrook: Freshman Mechanical Engineering student at UNL. Part of the Baja SAE team. I build hardware (like Terraflo Analytics) and software (like Differdle.com).";
+                response = "Alistair Westbrook: Freshman ME student @ UNL. Baja SAE member. Builder of Terraflo Analytics.";
                 break;
-            
+
             case 'socials':
-                response = "--- Contact Links ---<br>" +
-                           "<a href='https://github.com/AlistairWstbrk' target='_blank'>GitHub:   github.com/AlistairWstbrk</a><br>" +
-                           "<a href='https://www.linkedin.com/in/alistairw' target='_blank'>LinkedIn: www.linkedin.com/in/alistairw</a><br>" +
-                           "<a href='mailto:Westbrook.alistair@gmail.com'>Gmail:    Westbrook.alistair@gmail.com</a>";
+                response = "<a href='https://github.com/AlistairWstbrk' target='_blank'>GitHub</a> | <a href='https://www.linkedin.com/in/alistairw' target='_blank'>LinkedIn</a>";
                 break;
 
             case 'resume':
@@ -236,7 +200,7 @@ document.addEventListener("DOMContentLoaded", function() {
             case 'ls':
                 response = "about  projects  achievements";
                 break;
-
+            
             case 'cat':
                 if (arg === 'projects.txt') {
                     response = "--- Projects ---<br>" +
@@ -262,22 +226,17 @@ document.addEventListener("DOMContentLoaded", function() {
 
             case 'clear':
                 const initialMessages = document.querySelectorAll('.terminal-body p');
-                let messagesToKeep = 4;
-                for(let i = initialMessages.length - 1; i >= messagesToKeep; i--) {
-                    initialMessages[i].remove();
-                }
+                for(let i = initialMessages.length - 1; i >= 0; i--) { initialMessages[i].remove(); }
                 response = "Terminal cleared.";
                 break;
 
             case 'lebron':
                 const img = document.createElement('img');
                 img.src = 'lebron.png';
-                img.alt = 'LeBron James';
                 img.className = 'terminal-image';
                 terminalBody.appendChild(img);
                 break;
 
-            // === GAME COMMAND ===
             case 'game':
             case 'snake':
                 startGame();
@@ -299,32 +258,151 @@ document.addEventListener("DOMContentLoaded", function() {
         terminalBody.scrollTop = terminalBody.scrollHeight;
     }
 
-    /* --- SNAKE GAME LOGIC --- */
+    /* =================================================================== */
+    /* 6. HOLOGRAPHIC CAD VIEWER
+    /* =================================================================== */
+    window.closeCad = function() {
+        document.getElementById('cad-overlay').style.display = 'none';
+        if (cadAnimationId) cancelAnimationFrame(cadAnimationId);
+        printToTerminal("CAD Viewer Terminated.");
+    };
+
+    function launchCadViewer() {
+        const overlay = document.getElementById('cad-overlay');
+        const container = document.getElementById('cad-canvas-container');
+        
+        overlay.style.display = 'flex';
+        container.innerHTML = ''; 
+
+        cadScene = new THREE.Scene();
+        cadScene.fog = new THREE.FogExp2(0x000000, 0.05);
+
+        cadCamera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+        cadCamera.position.z = 5;
+
+        cadRenderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+        cadRenderer.setSize(container.clientWidth, container.clientHeight);
+        container.appendChild(cadRenderer.domElement);
+
+        const geometry = new THREE.TorusKnotGeometry(1.5, 0.4, 100, 16);
+        const material = new THREE.MeshBasicMaterial({ 
+            color: 0x00ffff, 
+            wireframe: true,
+            transparent: true,
+            opacity: 0.8
+        });
+
+        cadMesh = new THREE.Mesh(geometry, material);
+        cadScene.add(cadMesh);
+
+        const light = new THREE.PointLight(0xffffff, 1, 100);
+        light.position.set(10, 10, 10);
+        cadScene.add(light);
+
+        animateCad();
+
+        let isDragging = false;
+        let previousMousePosition = { x: 0, y: 0 };
+
+        container.addEventListener('mousedown', (e) => { isDragging = true; });
+        container.addEventListener('mouseup', (e) => { isDragging = false; });
+        container.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                const deltaMove = {
+                    x: e.offsetX - previousMousePosition.x,
+                    y: e.offsetY - previousMousePosition.y
+                };
+                cadMesh.rotation.y += deltaMove.x * 0.01;
+                cadMesh.rotation.x += deltaMove.y * 0.01;
+            }
+            previousMousePosition = { x: e.offsetX, y: e.offsetY };
+        });
+    }
+
+    function animateCad() {
+        cadAnimationId = requestAnimationFrame(animateCad);
+        if(cadMesh) {
+            cadMesh.rotation.x += 0.005;
+            cadMesh.rotation.y += 0.005;
+        }
+        cadRenderer.render(cadScene, cadCamera);
+    }
+
+    window.addEventListener('resize', () => {
+        if(document.getElementById('cad-overlay').style.display !== 'none') {
+            const container = document.getElementById('cad-canvas-container');
+            cadCamera.aspect = container.clientWidth / container.clientHeight;
+            cadCamera.updateProjectionMatrix();
+            cadRenderer.setSize(container.clientWidth, container.clientHeight);
+        }
+    });
+
+    /* =================================================================== */
+    /* 7. SYSTEM HUD ANIMATION
+    /* =================================================================== */
+    function startHudAnimation() {
+        const barCad = document.getElementById('bar-cad');
+        const barReact = document.getElementById('bar-react');
+        const barCpp = document.getElementById('bar-cpp');
+        const cpuTemp = document.getElementById('cpu-temp');
+
+        setTimeout(() => { barCad.style.width = "90%"; }, 500);
+        setTimeout(() => { barReact.style.width = "75%"; }, 800);
+        setTimeout(() => { barCpp.style.width = "85%"; }, 1100);
+
+        setInterval(() => {
+            barCad.style.width = (90 + Math.random() * 5 - 2.5) + "%";
+            barReact.style.width = (75 + Math.random() * 5 - 2.5) + "%";
+            barCpp.style.width = (85 + Math.random() * 5 - 2.5) + "%";
+
+            let temp = 40 + Math.floor(Math.random() * 15);
+            cpuTemp.innerText = temp + "°C";
+            if (temp > 50) cpuTemp.style.color = "red";
+            else cpuTemp.style.color = "var(--text-color)";
+        }, 2000);
+    }
+
+    /* =================================================================== */
+    /* 8. SNAKE GAME LOGIC
+    /* =================================================================== */
+    let snake = [], food = {}, direction = 'right', nextDirection = 'right', score = 0, gameInterval;
+
+    document.addEventListener('keydown', (e) => {
+        if (gameRunning) {
+            if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].indexOf(e.code) > -1) {
+                e.preventDefault();
+            }
+            switch(e.key) {
+                case 'ArrowUp': if (direction !== 'down') nextDirection = 'up'; break;
+                case 'ArrowDown': if (direction !== 'up') nextDirection = 'down'; break;
+                case 'ArrowLeft': if (direction !== 'right') nextDirection = 'left'; break;
+                case 'ArrowRight': if (direction !== 'left') nextDirection = 'right'; break;
+            }
+        }
+    });
+
     function startGame() {
         gameRunning = true;
         score = 0;
-        snake = [{x: 10, y: 10}]; // Start in middle
+        snake = [{x: 10, y: 10}];
         direction = 'right';
         nextDirection = 'right';
         
-        // Clear terminal for the game
         const initialMessages = document.querySelectorAll('.terminal-body p');
         for(let i = initialMessages.length - 1; i >= 0; i--) { initialMessages[i].remove(); }
 
-        // Create Board
         const board = document.createElement('div');
         board.id = 'snake-board';
         terminalBody.appendChild(board);
         
-        // Create Instructions
         const info = document.createElement('p');
         info.id = 'game-info';
-        info.innerHTML = "CONTROLS: Arrow Keys to Move. Score: 0";
+        info.innerHTML = "CONTROLS: Arrow Keys. Score: 0";
         terminalBody.appendChild(info);
 
-        terminalInput.blur(); // Remove focus from input
+        terminalInput.blur();
         spawnFood();
-        gameInterval = setInterval(updateGame, 100); // Game Loop speed
+        gameInterval = setInterval(updateGame, 100);
     }
 
     function spawnFood() {
@@ -332,7 +410,6 @@ document.addEventListener("DOMContentLoaded", function() {
             x: Math.floor(Math.random() * 20) + 1,
             y: Math.floor(Math.random() * 20) + 1
         };
-        // Don't spawn on snake body
         for (let part of snake) {
             if (part.x === food.x && part.y === food.y) spawnFood();
         }
@@ -341,39 +418,31 @@ document.addEventListener("DOMContentLoaded", function() {
     function updateGame() {
         direction = nextDirection;
         const head = { ...snake[0] };
-
         if (direction === 'right') head.x++;
         if (direction === 'left') head.x--;
-        if (direction === 'up') head.y--; // Grid starts top-left
+        if (direction === 'up') head.y--; 
         if (direction === 'down') head.y++;
 
-        // Collision Check (Walls or Self)
         if (head.x > 20 || head.x < 1 || head.y > 20 || head.y < 1 || snake.some(part => part.x === head.x && part.y === head.y)) {
             endGame();
             return;
         }
-
-        snake.unshift(head); // Add new head
-
-        // Check if ate food
+        snake.unshift(head);
         if (head.x === food.x && head.y === food.y) {
             score += 10;
             document.getElementById('game-info').innerHTML = `CONTROLS: Arrow Keys. Score: ${score}`;
-            playSound('eat'); // Eat sound
+            playSound('success');
             spawnFood();
         } else {
-            snake.pop(); // Remove tail if not eating
+            snake.pop();
         }
-
         drawGame();
     }
 
     function drawGame() {
         const board = document.getElementById('snake-board');
         if(!board) return;
-        board.innerHTML = ''; // Clear board
-
-        // Draw Snake
+        board.innerHTML = '';
         snake.forEach(part => {
             const snakeElement = document.createElement('div');
             snakeElement.style.gridRowStart = part.y;
@@ -381,8 +450,6 @@ document.addEventListener("DOMContentLoaded", function() {
             snakeElement.classList.add('snake-cell', 'snake-body');
             board.appendChild(snakeElement);
         });
-
-        // Draw Food
         const foodElement = document.createElement('div');
         foodElement.style.gridRowStart = food.y;
         foodElement.style.gridColumnStart = food.x;
@@ -393,13 +460,10 @@ document.addEventListener("DOMContentLoaded", function() {
     function endGame() {
         clearInterval(gameInterval);
         gameRunning = false;
-        playSound('fail');
-        
         const board = document.getElementById('snake-board');
         if(board) board.remove();
         const info = document.getElementById('game-info');
         if(info) info.remove();
-
         printToTerminal(`GAME OVER. Final Score: ${score}`);
         printToTerminal("Type 'game' to play again.");
         terminalInput.focus();
