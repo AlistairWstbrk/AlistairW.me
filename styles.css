@@ -1,4 +1,4 @@
-/* === BRUTALIST COLORS === */
+/* === BRUTALIST THEME VARS === */
 :root {
     --primary-color: #FF9500;
     --bg-color: #000000;
@@ -17,7 +17,7 @@ body, html {
     scroll-behavior: smooth;
 }
 
-/* === VANTA BACKGROUND === */
+/* === BACKGROUND === */
 #vanta-bg {
     position: fixed;
     width: 100%;
@@ -25,6 +25,57 @@ body, html {
     z-index: -1;
     top: 0;
     left: 0;
+}
+
+/* === SYSTEM HUD STYLES === */
+#system-hud {
+    position: fixed;
+    top: 100px;
+    right: 20px;
+    width: 220px;
+    background-color: rgba(0, 0, 0, 0.8);
+    border: 1px solid var(--primary-color);
+    padding: 15px;
+    z-index: 100;
+    font-family: 'Share Tech Mono', monospace;
+    box-shadow: 0 0 15px rgba(255, 149, 0, 0.2);
+    backdrop-filter: blur(5px);
+    /* Hide on mobile */
+    display: none; 
+}
+@media (min-width: 1000px) {
+    #system-hud { display: block; }
+}
+.hud-header {
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 10px;
+    font-size: 0.8rem;
+    color: var(--text-color);
+    padding-bottom: 5px;
+}
+.hud-row { margin-bottom: 8px; font-size: 0.8rem; }
+.hud-label { display: block; color: var(--primary-color); margin-bottom: 2px; }
+.hud-value { float: right; color: var(--text-color); }
+.hud-bar-container {
+    width: 100%;
+    height: 6px;
+    background-color: #333;
+    position: relative;
+}
+.hud-bar {
+    height: 100%;
+    background-color: var(--primary-color);
+    width: 0%; /* Animated by JS */
+    box-shadow: 0 0 5px var(--primary-color);
+    transition: width 0.5s ease-out;
+}
+.hud-footer {
+    margin-top: 15px;
+    font-size: 0.7rem;
+    text-align: right;
+    color: #555;
+    border-top: 1px solid #333;
+    padding-top: 5px;
 }
 
 /* === NAV === */
@@ -67,6 +118,7 @@ main {
     box-shadow: 0 0 20px rgba(255, 149, 0, 0.5);
     backdrop-filter: blur(3px);
     z-index: 10;
+    position: relative; /* For CAD overlay */
 }
 .terminal-header {
     background-color: var(--border-color);
@@ -80,38 +132,59 @@ main {
     color: var(--primary-color);
     overflow-y: auto;
     font-size: 1rem;
+    position: relative;
 }
-.terminal-body p {
-    margin: 5px 0;
-    word-break: break-all;
+.terminal-body p { margin: 5px 0; word-break: break-all; }
+
+/* === CAD OVERLAY === */
+#cad-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 10, 20, 0.95);
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+}
+#cad-controls {
+    padding: 10px;
+    border-bottom: 1px solid var(--primary-color);
+    display: flex;
+    justify-content: space-between;
+    background: rgba(0,0,0,0.5);
+    color: var(--primary-color);
+    font-size: 0.9rem;
+}
+#cad-controls button {
+    background: none;
+    border: none;
+    color: red;
+    cursor: pointer;
+    font-family: 'Share Tech Mono', monospace;
+}
+#cad-canvas-container {
+    flex-grow: 1;
+    width: 100%;
+    height: 100%;
+    cursor: move;
 }
 
-/* === LOADING BAR STYLES === */
-#loading-bar p {
-    color: var(--text-color); /* White text */
-}
+/* === LOADING BAR === */
+#loading-bar p { color: var(--text-color); }
 .loading-square {
     display: inline-block;
     width: 10px;
     height: 10px;
-    background-color: #333; /* Empty square color */
+    background-color: #333;
     margin: 0 1px;
 }
-.loading-square.filled {
-    background-color: var(--primary-color); /* Filled square color (orange) */
-}
+.loading-square.filled { background-color: var(--primary-color); }
 
-
-/* === PROMPT STYLES === */
-.prompt-line {
-    padding: 0px 20px 10px 20px;
-    display: flex;
-}
-.prompt-user {
-    color: var(--text-color);
-    margin-right: 10px;
-    font-size: 1.1rem;
-}
+/* === PROMPT === */
+.prompt-line { padding: 0px 20px 10px 20px; display: flex; }
+.prompt-user { color: var(--text-color); margin-right: 10px; font-size: 1.1rem; }
 #terminal-input {
     background: transparent;
     border: none;
@@ -122,13 +195,8 @@ main {
     width: 85%;
 }
 
-/* === SECTION STYLES === */
-section {
-    padding: 100px 10%;
-    min-height: 80vh;
-    position: relative;
-    z-index: 10;
-}
+/* === SECTIONS === */
+section { padding: 100px 10%; min-height: 80vh; position: relative; z-index: 10; }
 section h2 {
     font-size: 3rem;
     text-transform: uppercase;
@@ -137,7 +205,7 @@ section h2 {
     padding-bottom: 10px;
 }
 
-/* === BRUTALIST MODULE STYLES === */
+/* === MODULES === */
 .module-container {
     border: 2px solid var(--border-color);
     background-color: var(--bg-color);
@@ -152,12 +220,6 @@ section h2 {
     color: var(--bg-color);
     font-weight: bold;
 }
-.module-header-title { text-transform: uppercase; }
-.module-header-info {
-    font-size: 0.9rem;
-    background-color: var(--primary-color);
-    padding: 3px 6px;
-}
 .module-content {
     padding: 20px;
     display: flex;
@@ -166,14 +228,13 @@ section h2 {
     justify-content: center;
 }
 
-/* === PROJECT-SPECIFIC STYLES === */
+/* === PROJECT ASSETS === */
 .project-image {
     width: 100%;
     max-width: 450px;
     border: 2px solid var(--border-color);
     margin-bottom: 20px;
 }
-
 .module-content blockquote {
     border-left: 3px solid var(--primary-color);
     padding-left: 15px;
@@ -183,7 +244,6 @@ section h2 {
     text-align: left;
     width: 100%;
 }
-
 .cta-button {
     display: inline-block;
     background-color: var(--primary-color);
@@ -195,12 +255,7 @@ section h2 {
     border: 1px solid var(--primary-color);
     transition: all 0.3s ease;
 }
-
-.cta-button:hover {
-    background-color: transparent;
-    color: var(--primary-color);
-}
-
+.cta-button:hover { background-color: transparent; color: var(--primary-color); }
 .project-details {
     text-align: left;
     width: 100%;
@@ -210,51 +265,23 @@ section h2 {
     padding-top: 20px;
 }
 
-.project-details p {
-    color: #ccc;
-    margin-bottom: 10px;
-}
+/* === ABOUT ME === */
+#about .module-content p { color: var(--text-color); width: 100%; }
 
-/* === "ABOUT ME" SECTION STYLES === */
-#about .module-content p {
-    color: var(--text-color);
-    width: 100%;
-}
-
-/* === FOOTER STYLES === */
+/* === FOOTER === */
 footer {
     padding: 20px 10%;
     text-align: center;
     border-top: 2px solid var(--border-color);
     background-color: var(--bg-color);
     z-index: 10;
-    position: relative; /* This makes sure it renders on top of the Vanta bg */
+    position: relative;
 }
+footer a { color: var(--text-color); text-decoration: none; margin: 0 15px; font-size: 0.9rem; transition: color 0.3s ease; }
+footer a:hover { color: var(--primary-color); }
+footer span { color: var(--border-color); opacity: 0.5; }
 
-footer a {
-    color: var(--text-color);
-    text-decoration: none;
-    margin: 0 15px;
-    font-size: 0.9rem;
-    transition: color 0.3s ease;
-}
-
-footer a:hover {
-    color: var(--primary-color);
-}
-
-footer span {
-    color: var(--border-color);
-    opacity: 0.5;
-}
-/* === NEW TERMINAL IMAGE STYLE === */
-.terminal-image {
-    width: 90%; /* Make it fill most of the terminal */
-    max-width: 300px; /* But not get too big */
-    margin-top: 10px;
-    border: 2px solid var(--border-color);
-}
-/* === SNAKE GAME STYLES === */
+/* === SNAKE GAME & IMAGES === */
 #snake-board {
     width: 300px;
     height: 300px;
@@ -263,22 +290,14 @@ footer span {
     display: grid;
     grid-template-rows: repeat(20, 1fr);
     grid-template-columns: repeat(20, 1fr);
+    margin: 10px 0;
+}
+.snake-cell { width: 100%; height: 100%; }
+.snake-body { background-color: var(--primary-color); box-shadow: 0 0 5px var(--primary-color); }
+.snake-food { background-color: #fff; border-radius: 50%; box-shadow: 0 0 5px #fff; }
+.terminal-image {
+    width: 90%;
+    max-width: 300px;
     margin-top: 10px;
-    margin-bottom: 10px;
-}
-
-.snake-cell {
-    width: 100%;
-    height: 100%;
-}
-
-.snake-body {
-    background-color: var(--primary-color);
-    box-shadow: 0 0 5px var(--primary-color);
-}
-
-.snake-food {
-    background-color: #fff; /* White food */
-    border-radius: 50%;
-    box-shadow: 0 0 5px #fff;
+    border: 2px solid var(--border-color);
 }
