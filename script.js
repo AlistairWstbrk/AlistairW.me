@@ -3,53 +3,31 @@
 /* =================================================================== */
 document.addEventListener("DOMContentLoaded", function() {
 
+    /* =================================================================== */
+    /* 1. CAD FILE REGISTRY (EDIT THIS LIST!)
+    /* =================================================================== */
+    const cadFiles = {
+        // 'command_name': { file: 'actual_file.stl', description: 'Description for list' }
+        'enclosure': { 
+            file: 'project.stl', 
+            description: 'Terraflo Main Enclosure (v2)' 
+        },
+        'chassis': { 
+            file: 'chassis.stl', // Make sure you have this file if you use it
+            description: 'Baja SAE Front Suspension' 
+        },
+        'mount': { 
+            file: 'sensor_mount.stl', 
+            description: '3D Printed Sensor Bracket' 
+        }
+    };
+
     /* --- GLOBAL VARIABLES FOR CAD --- */
     let cadRenderer, cadScene, cadCamera, cadAnimationId;
     let cadMesh;
 
     /* =================================================================== */
-    /* 1. AUDIO SYNTHESIS
-    /* =================================================================== */
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
-    function playSound(type) {
-        if (audioCtx.state === 'suspended') audioCtx.resume();
-        const osc = audioCtx.createOscillator();
-        const gainNode = audioCtx.createGain();
-        
-        osc.connect(gainNode);
-        gainNode.connect(audioCtx.destination);
-
-        if (type === 'key') {
-            // === NEW MECHANICAL CLICK SOUND ===
-            // Uses a square wave for a "sharper" click
-            osc.type = 'square'; 
-            
-            // Quick frequency drop simulates the "tactile bump"
-            osc.frequency.setValueAtTime(300, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(50, audioCtx.currentTime + 0.03);
-            
-            // Very short duration (snappy)
-            gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.03);
-            
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.03);
-            
-        } else if (type === 'success') {
-            // "Access Granted" Chime (Unchanged)
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(500, audioCtx.currentTime);
-            osc.frequency.linearRampToValueAtTime(1000, audioCtx.currentTime + 0.1);
-            gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
-            gainNode.gain.linearRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.3);
-        }
-    }
-
-    /* =================================================================== */
-    /* 2. Vanta.js
+    /* 2. Vanta.js Script
     /* =================================================================== */
     let vantaEffect = VANTA.NET({
         el: "#vanta-bg",
@@ -60,8 +38,8 @@ document.addEventListener("DOMContentLoaded", function() {
         minWidth: 200.00,
         scale: 1.00,
         scaleMobile: 1.00,
-        color: 0xff9500, 
-        backgroundColor: 0x0, 
+        color: 0xff9500, // Orange
+        backgroundColor: 0x0, // Black
         points: 10.00,
         maxDistance: 25.00,
         spacing: 20.00
@@ -86,7 +64,6 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     function activateHackerMode() {
-        playSound('success');
         document.documentElement.style.setProperty('--primary-color', '#00ff00');
         document.documentElement.style.setProperty('--text-color', '#00ff00');
         document.documentElement.style.setProperty('--border-color', '#00ff00');
@@ -124,14 +101,13 @@ document.addEventListener("DOMContentLoaded", function() {
         const fillInterval = setInterval(() => {
             if (currentSquare < numSquares) {
                 loadingSquares.children[currentSquare].classList.add('filled');
-                playSound('key');
                 currentSquare++;
             } else {
                 clearInterval(fillInterval);
                 document.getElementById('loading-bar').style.display = 'none';
                 
                 printToTerminal("Access granted. Welcome, user.");
-                printToTerminal("Type 'help' or 'cad' to begin.");
+                printToTerminal("Type 'help' to view commands.");
                 
                 document.querySelector('.prompt-line').style.display = 'flex';
                 document.getElementById('terminal-input').focus();
@@ -145,8 +121,6 @@ document.addEventListener("DOMContentLoaded", function() {
     const terminalInput = document.getElementById('terminal-input');
     const terminalBody = document.querySelector('.terminal-body');
     let gameRunning = false;
-
-    terminalInput.addEventListener('input', () => playSound('key'));
 
     terminalInput.addEventListener('keydown', function(event) {
         if (gameRunning) return;
@@ -164,12 +138,12 @@ document.addEventListener("DOMContentLoaded", function() {
         let response = "";
         const parts = command.split(' ');
         const baseCommand = parts[0];
-        const arg = parts[1];
+        const arg = parts[1]; // This is the file name they type (e.g., "enclosure")
 
         switch (baseCommand) {
             case 'help':
                 response = "Available commands: <br>" +
-                           "[cad] - Launch Holographic CAD Viewer <span style='color:#fff'>(NEW!)</span><br>" +
+                           "[cad] - List or view 3D files <span style='color:#fff'>(UPDATED)</span><br>" +
                            "[game] - Play Snake<br>" +
                            "[whoami] - Bio<br>" +
                            "[socials] - Links<br>" +
@@ -181,10 +155,29 @@ document.addEventListener("DOMContentLoaded", function() {
                            "[lebron] - The GOAT";
                 break;
 
+            // === UPDATED CAD COMMAND ===
             case 'cad':
-            case 'prototype':
-                launchCadViewer();
-                return;
+                if (!arg) {
+                    // No argument? List available files
+                    let fileList = "--- Available CAD Files ---<br>";
+                    fileList += "Usage: 'cad [name]' to load a file.<br><br>";
+                    
+                    for (const [key, data] of Object.entries(cadFiles)) {
+                        fileList += `[${key}] - ${data.description}<br>`;
+                    }
+                    response = fileList;
+                } 
+                else if (cadFiles[arg]) {
+                    // Argument exists and matches a file? Load it!
+                    launchCadViewer(cadFiles[arg].file);
+                    return; // Exit so we don't print response
+                } 
+                else {
+                    // Argument exists but doesn't match
+                    response = `File '${arg}' not found in registry.<br>Type 'cad' to see available files.`;
+                }
+                break;
+            // ===========================
 
             case 'whoami':
                 response = "Alistair Westbrook: Freshman ME student @ UNL. Baja SAE member. Builder of Terraflo Analytics.";
@@ -258,7 +251,6 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     function printToTerminal(message) {
-        playSound('success');
         const output = document.createElement('p');
         output.innerHTML = message;
         terminalBody.appendChild(output);
@@ -266,7 +258,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     /* =================================================================== */
-    /* 6. HOLOGRAPHIC CAD VIEWER (WITH STL LOADER)
+    /* 6. HOLOGRAPHIC CAD VIEWER (FIXED LIGHTING & LOADING)
     /* =================================================================== */
     window.closeCad = function() {
         document.getElementById('cad-overlay').style.display = 'none';
@@ -274,66 +266,88 @@ document.addEventListener("DOMContentLoaded", function() {
         printToTerminal("CAD Viewer Terminated.");
     };
 
-    function launchCadViewer() {
+    function launchCadViewer(filename) {
         const overlay = document.getElementById('cad-overlay');
         const container = document.getElementById('cad-canvas-container');
+        const controlText = document.querySelector('#cad-controls span');
         
         overlay.style.display = 'flex';
         container.innerHTML = ''; 
+        controlText.innerText = `VIEWING: ${filename.toUpperCase()}`;
 
         cadScene = new THREE.Scene();
-        cadScene.fog = new THREE.FogExp2(0x000000, 0.05);
+        // Dark grey background for better visibility
+        cadScene.background = new THREE.Color(0x111111);
 
+        // Camera Setup
         cadCamera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
-        cadCamera.position.z = 100; // Move camera back for large STL files
+        cadCamera.position.z = 100; 
+        cadCamera.position.y = 50;
 
-        cadRenderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+        cadRenderer = new THREE.WebGLRenderer({ alpha: false, antialias: true });
         cadRenderer.setSize(container.clientWidth, container.clientHeight);
         container.appendChild(cadRenderer.domElement);
 
+        // === LIGHTING SETUP (Crucial for preventing Black STL) ===
+        // 1. Ambient Light (General soft light)
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        cadScene.add(ambientLight);
+
+        // 2. Directional Light (Sun-like shadow caster)
+        const dirLight = new THREE.DirectionalLight(0xffffff, 1);
+        dirLight.position.set(50, 50, 100);
+        cadScene.add(dirLight);
+        
+        // 3. Backlight (To see the other side)
+        const backLight = new THREE.DirectionalLight(0xffffff, 0.5);
+        backLight.position.set(-50, 50, -100);
+        cadScene.add(backLight);
+
         // === LOAD THE STL FILE ===
         const loader = new THREE.STLLoader();
+        
+        printToTerminal(`Loading ${filename}... please wait.`);
+        
         loader.load(
-            'project.stl', // Ensure your file is named exactly this
+            filename, 
             function (geometry) {
-                // Center the geometry
                 geometry.center();
 
-                // Create Material
-                const material = new THREE.MeshBasicMaterial({ 
-                    color: 0x00ffff, 
-                    wireframe: true,
-                    transparent: true,
-                    opacity: 0.8
+                // === MATERIAL SETUP (The "Black Fix") ===
+                // MeshStandardMaterial reacts to light. 
+                // color: 0xaaaaaa is a nice "Tech Grey"
+                // metalness/roughness makes it look like metal or plastic
+                const material = new THREE.MeshStandardMaterial({ 
+                    color: 0xaaaaaa, 
+                    roughness: 0.5,
+                    metalness: 0.5,
+                    side: THREE.DoubleSide
                 });
 
                 cadMesh = new THREE.Mesh(geometry, material);
                 
-                // STL files are often huge or tiny. Adjust scale here if needed.
-                // If your object is invisible, try changing these to 1, 1, 1 or 100, 100, 100
+                // SCALE ADJUSTMENT
+                // Adjust this if your model is still too big/small
                 cadMesh.scale.set(0.5, 0.5, 0.5); 
                 
-                // Rotate it upright (STLs often export rotated)
+                // Fix Rotation
                 cadMesh.rotation.x = -Math.PI / 2;
 
                 cadScene.add(cadMesh);
+                printToTerminal("Model loaded successfully.");
             },
             (xhr) => {
-                console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+                // Optional loading progress
             },
             (error) => {
                 console.error("Error loading STL:", error);
-                printToTerminal("ERROR: project.stl not found. Please export your CAD file.");
+                printToTerminal(`ERROR: Could not load ${filename}. Check file name.`);
             }
         );
 
-        // Lights
-        const light = new THREE.PointLight(0xffffff, 1, 100);
-        light.position.set(10, 10, 10);
-        cadScene.add(light);
-
         animateCad();
 
+        // Mouse Rotation
         let isDragging = false;
         let previousMousePosition = { x: 0, y: 0 };
 
@@ -345,7 +359,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     x: e.offsetX - previousMousePosition.x,
                     y: e.offsetY - previousMousePosition.y
                 };
-                cadMesh.rotation.z -= deltaMove.x * 0.01; // Z rotation for STL usually
+                cadMesh.rotation.z -= deltaMove.x * 0.01;
                 cadMesh.rotation.x -= deltaMove.y * 0.01;
             }
             previousMousePosition = { x: e.offsetX, y: e.offsetY };
@@ -355,8 +369,7 @@ document.addEventListener("DOMContentLoaded", function() {
     function animateCad() {
         cadAnimationId = requestAnimationFrame(animateCad);
         if(cadMesh) {
-            // Slow auto-rotation
-            cadMesh.rotation.z += 0.002;
+            cadMesh.rotation.z += 0.002; // Auto rotate
         }
         cadRenderer.render(cadScene, cadCamera);
     }
@@ -439,7 +452,6 @@ document.addEventListener("DOMContentLoaded", function() {
         if (head.x === food.x && head.y === food.y) {
             score += 10;
             document.getElementById('game-info').innerHTML = `CONTROLS: Arrow Keys. Score: ${score}`;
-            playSound('success');
             spawnFood();
         } else {
             snake.pop();
