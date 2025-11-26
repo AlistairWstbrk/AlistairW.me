@@ -43,7 +43,11 @@ document.addEventListener("DOMContentLoaded", function() {
             file: 'project.stl', 
             description: 'Example file' 
         },
-        // Add more files here...
+        'mushroom': { 
+            file: 'mushroom ornament.stl', 
+            description: 'A 3D-printable Christmas ornament currently in development, designed with a mushroom cap that lights up via embedded LEDs.'      
+        }    
+            // Add more files here...
     };        
 
     /* =================================================================== */
