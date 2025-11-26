@@ -39,9 +39,9 @@ document.addEventListener("DOMContentLoaded", function() {
     /* 1. CAD FILE REGISTRY (EDIT THIS!)
     /* =================================================================== */
     const cadFiles = {
-        'enclosure': { 
+        'gnome': { 
             file: 'project.stl', 
-            description: 'Terraflo Main Enclosure (v2)' 
+            description: 'Example file' 
         },
         // Add more files here...
     };
