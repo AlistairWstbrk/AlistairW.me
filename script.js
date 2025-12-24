@@ -6,8 +6,8 @@ document.addEventListener("DOMContentLoaded", function() {
     /* --- GLOBAL VARIABLES --- */
     let cadRenderer, cadScene, cadCamera, cadAnimationId, cadControls;
     let cadMesh;
-    let typedInstance;     
-    let loadingInterval;   
+    let typedInstance;      
+    let loadingInterval;    
 
     /* =================================================================== */
     /* 0. SKIP INTRO FUNCTION
@@ -52,7 +52,7 @@ document.addEventListener("DOMContentLoaded", function() {
             description: 'A frame that can be fitted to a window to suck any vapors or fumes out of a room using an 120mm computer fan.'
         }
             // Add more files here...
-    };        
+    };              
 
     /* =================================================================== */
     /* 2. Vanta.js
@@ -187,7 +187,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     }
                     response = fileList;
                 } else if (cadFiles[arg]) {
-                    launchCadViewer(cadFiles[arg].file);
+                    window.launchCadViewer(cadFiles[arg].file);
                     return; 
                 } else {
                     response = `File '${arg}' not found. Type 'cad' for list.`;
@@ -229,6 +229,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 if (arg === 'projects.txt') {
                     response = "--- Projects ---<br>" +
                                "* <strong>Terraflo Analytics (AI/Hardware)</strong><br>" +
+                               "* <strong>120mm Fan Frame (CAD)</strong><br>" +
                                "* <strong>Differdle.com (Web App)</strong>";
                 } else {
                     response = `File not found: "${arg}". Did you mean 'cat projects.txt'?`;
@@ -292,7 +293,6 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     };
 
-    // === NEW ZOOM FUNCTION ===
     window.cadZoom = function(direction) {
         if (!cadCamera) return;
         const zoomFactor = 1.2;
@@ -304,7 +304,8 @@ document.addEventListener("DOMContentLoaded", function() {
         cadCamera.updateProjectionMatrix();
     };
 
-    function launchCadViewer(filename) {
+    // NOTE: Made this window.launchCadViewer so HTML buttons can access it
+    window.launchCadViewer = function(filename) {
         const overlay = document.getElementById('cad-overlay');
         const container = document.getElementById('cad-canvas-container');
         const controlText = document.getElementById('cad-title-text');
@@ -323,8 +324,7 @@ document.addEventListener("DOMContentLoaded", function() {
         cadRenderer.setSize(container.clientWidth, container.clientHeight);
         container.appendChild(cadRenderer.domElement);
 
-        // === ORBIT CONTROLS (The Magic Zoom/Pan/Rotate Tool) ===
-        // This allows scroll wheel zoom and mouse dragging
+        // Orbit Controls
         cadControls = new THREE.OrbitControls(cadCamera, cadRenderer.domElement);
         cadControls.enableDamping = true;
         cadControls.dampingFactor = 0.05;
@@ -370,7 +370,7 @@ document.addEventListener("DOMContentLoaded", function() {
             
             cadCamera.position.set(0, 5, 20);
             cadCamera.lookAt(0, 0, 0);
-            cadControls.update(); // Important to update controls after moving camera
+            cadControls.update(); 
 
             printToTerminal("Model loaded.");
         }, undefined, (err) => { console.error(err); printToTerminal("Error loading file."); });
@@ -381,16 +381,13 @@ document.addEventListener("DOMContentLoaded", function() {
     function animateCad() {
         cadAnimationId = requestAnimationFrame(animateCad);
         
-        // Need to update controls every frame for damping
         if(cadControls) cadControls.update();
 
-        // Update HUD Rotation/Zoom Display
         if(cadMesh && cadCamera) {
             const rotX = cadMesh.rotation.x.toFixed(2);
             const rotY = cadMesh.rotation.y.toFixed(2);
             const zoomLvl = (20 / cadCamera.position.distanceTo(new THREE.Vector3(0,0,0))).toFixed(2);
             
-            // Safe check if element exists
             const rotEl = document.getElementById('rot-val');
             const zoomEl = document.getElementById('zoom-val');
             if (rotEl) rotEl.innerText = `${rotX}, ${rotY}`;
