@@ -50,6 +50,7 @@ document.addEventListener("DOMContentLoaded", function() {
         'vent-frame': { 
             file: '120mm Frame V1.stl', 
             description: 'A frame that can be fitted to a window to suck any vapors or fumes out of a room using an 120mm computer fan.'
+        }
             // Add more files here...
     };        
 
